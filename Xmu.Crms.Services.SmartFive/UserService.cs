@@ -302,7 +302,7 @@ namespace Xmu.Crms.Services.SmartFive
                         select i).SingleOrDefault();
             if (user.Gender != null) u.Gender = user.Gender;
             if (user.Education != null) u.Education = user.Education;
-            _db.SaveChanges();
+            //_db.SaveChanges();
         }
     }
 }

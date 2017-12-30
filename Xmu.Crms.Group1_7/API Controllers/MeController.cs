@@ -56,6 +56,7 @@ namespace Xmu.Crms.Group1_7
             try
             {
                 UserInfo user = _userService.GetUserByUserId(User.Id());
+                user.School = _schoolService.GetSchoolBySchoolId(user.SchoolId ?? -1);
                 return Json(user);
             }
             catch (UserNotFoundException e)

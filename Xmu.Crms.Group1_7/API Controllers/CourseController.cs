@@ -36,7 +36,6 @@ namespace Xmu.Crms.Group1_7
             _gradeService = gradeService;
             _header = header;
         }
-        [Produces("application/json")]
         //获取与当前用户相关联的课程列表
         //GET:/course
         [HttpGet("api/course")]
@@ -45,25 +44,23 @@ namespace Xmu.Crms.Group1_7
             try
             {
                 var courses = _courseService.ListCourseByUserId(User.Id());
-                return Json(courses.Select(c => new {
+                return Json(courses.Select(c => new
+                {
                     id = c.Id,
                     name = c.Name,
-
-
-                 startdate=c.StartDate,
-                 enddate = c.EndDate,
-
-                 teacherName=c.Teacher.Name,
-                 description=c.Description
-              }));
+                    numClass = _classService.ListClassByCourseId(c.Id).Count,
+                    numStudent = _classService.ListClassByCourseId(c.Id).Aggregate(0, (total, cls) => _db.Entry(cls).Collection(cl => cl.CourseSelections).Query().Count() + total),
+                    startTime = c.StartDate.ToString("yyyy-MM-dd"),
+                    endTime = c.EndDate.ToString("yyyy-MM-dd"),
+                }));
             }
-            catch (CourseNotFoundException)
+            catch (CourseNotFoundException e)
             {
-                return StatusCode(404, new { msg = "未找到课程" });
+                return StatusCode(404, e.GetAlertInfo());
             }
             catch (ArgumentException)
             {
-                return StatusCode(400, new { msg = "错误的ID格式" });
+                return StatusCode(400, "错误的ID格式");
             }
             //var result = new JsonResult();
             //var data = new object[]

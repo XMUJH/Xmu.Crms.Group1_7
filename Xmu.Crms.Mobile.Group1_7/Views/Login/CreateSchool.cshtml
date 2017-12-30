@@ -21,7 +21,7 @@
             $("#city").text("城市:" + window.localStorage.getItem("city") + "市");
             $("#create").click(function ()
             {
-                var data0 = { schoolname: document.getElementById("schoolname").value };
+                var data0 = { schoolname: document.getElementById("schoolname").value, province: window.localStorage.getItem("province"), city: window.localStorage.getItem("city") };
                 $.ajax({
                     type: 'POST',
                     url: "/api/school",

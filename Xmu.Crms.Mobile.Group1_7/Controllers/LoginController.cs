@@ -40,13 +40,7 @@ namespace Xmu.Crms.Mobile.Group1_7.Controllers
             return View();
         }
 
-       // [Route("/")]
-       // public IActionResult HomePage()
-       // {
-       //     return Redirect("/Login/LoginUI");
-       // }
-
-        [Route("/Login/LoginUI")]
+        [Route("/Login/Login")]
         public IActionResult LoginUI()
         {
             return View();

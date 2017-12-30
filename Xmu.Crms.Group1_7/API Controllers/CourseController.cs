@@ -36,7 +36,6 @@ namespace Xmu.Crms.Group1_7
             _gradeService = gradeService;
             _header = header;
         }
-        [Route("")]
         [Produces("application/json")]
         //获取与当前用户相关联的课程列表
         //GET:/course

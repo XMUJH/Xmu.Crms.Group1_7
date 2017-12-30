@@ -40,6 +40,13 @@ namespace Xmu.Crms.Group1_7
             public string password { set; get; }
         }
 
+
+        [Route("/")]
+        public IActionResult HomePage()
+        {
+            return Redirect("/Login/Login");
+        }
+
         //获取当前用户
         // GET: /me
         [HttpGet("api/me")]

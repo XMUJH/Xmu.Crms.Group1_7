@@ -30,7 +30,7 @@ namespace Xmu.Crms.Group1_7
             _classService = classService;
             _seminarGroupService = seminarGroupService;
         }
-        [Route("")]
+
         [Produces("application/json")]
         //获取与当前用户相关的或者符合条件的班级列表
         //GET:/class

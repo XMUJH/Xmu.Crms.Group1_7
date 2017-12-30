@@ -1,0 +1,95 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/css/ClassManage.css" type="text/css">
+    
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: 'GET',
+                url: "/api/course/29/seminar/current",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $("#courseName").text(result.Data.courseName);
+                    $("#seminarName").text(result.Data.name);
+                    $("#Period").text(result.Data.startTime + "—" + result.Data.endTime);
+                    if (result.Data.groupingMethod == "fixed")
+                        $("#groupingMethod").text("固定分组");
+                    else
+                        $("#groupingMethod").text("随机分组");
+                    
+                    $.each(result.Data.classes, function (i, value)
+                    {
+                        var imgObj = "<img src=\"\\images\\themes\\ClassManage.png\" class=\"classIcon\">";
+                        $("#classes").append('<div class=\"class\" id=\"class\">' + imgObj + '<p class=\"className\">' + value.name+ '</p ></div > ');
+                    });
+                }
+            })
+        });
+        $(document).on("click",".class",function () {
+            $.ajax({
+                type: 'GET',
+                url: "/api/course/23/seminar/current",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result.Data.groupingMethod == "fixed")
+                        $(window).attr("location", '/Teacher/FixedRollStartCallUI');
+                    else
+                        $(window).attr("location", '/Teacher/RandomRollStartCallUI');
+                }
+
+            })
+        })
+    </script>
+</head>
+<body class="body">
+    <!--设置蓝色上方-->
+    <div class='topBox'>
+        <span class="title" id="courseName" ></span>
+        <div class="seminarText" id="seminarName"></div>
+    </div>
+
+    <!--讨论课的时间和分组方式-->
+    <div class="clockAndGroupDiv">
+        <img src="~/images/themes/clock.png" class="icon">
+        <span class="timeText" id="Period"></span>
+    </div>
+
+    <div class="clockAndGroupDiv">
+        <img src="~/images/themes/clip.png" class="icon">
+        <span id="groupingMethod"></span>
+    </div>
+<div id="classes" style="margin-left: 10%;width:90%;">
+    <!--班级Icon及名字,增加新班级就复制一个div-->
+</div>
+    
+
+</body>
+</html>
+

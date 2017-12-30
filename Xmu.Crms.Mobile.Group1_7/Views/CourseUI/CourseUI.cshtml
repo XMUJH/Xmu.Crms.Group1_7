@@ -1,0 +1,58 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>Untitled Document</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <link href="~/css/CourseUI.css" rel="stylesheet" type="text/css">
+    <script>
+        $(document).ready(function ()
+        {
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/course/13/seminar?embedGrade=true",
+                    data:"",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result)
+                    {
+                        $.each(result.Data, function (i, value)
+                        {
+                            if (i == 0) $("#seminars").append('<div class="blueBox">' + '<p class="LeftBoxText">' + "讨论课" + (i + 1) + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "至" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:未完成" + '</p>' + '</div>');
+                            if (i == 1) $("#seminars").append('<div class="greyBox">' + '<p class="LeftBoxText">' + "讨论课" + (i + 1) + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "至" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:已完成" + '</p>' + '</div>');
+                        });
+                    }
+                })
+        })
+        $(document).on("click", ".ninedotImg", function ()
+        {
+            $(window).attr("location", '/CourseInfoUI/CourseInfoUI');
+        })
+        $(document).on("click", ".blueBox", function ()
+        {
+            $(window).attr("location", '/SeminarUI/Seminar');
+        })
+    </script>
+</head>
+<body class="body">
+    <div class="topBox">
+        <span class="title"> OOAD</span>
+        <img class="ninedotImg" src="~/images/Course/nine.png"/>
+    </div>
+    <div id="seminars"></div>
+</body>
+</html>
+
+

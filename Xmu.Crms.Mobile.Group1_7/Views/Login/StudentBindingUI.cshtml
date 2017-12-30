@@ -1,0 +1,88 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="~/css/StudentBindingUI.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#studentNumber").val(window.localStorage.getItem("studentNumber"));
+            $("#name").val(window.localStorage.getItem("name"));
+            $("#school").val(window.localStorage.getItem("school"));
+            $("#chooseschool").click(function ()
+            {
+                if (!window.localStorage)
+                {
+                    alert("浏览器支持localstorage");
+                } else
+                {
+                    window.localStorage.setItem('type', "student");
+                    var storage = window.localStorage;
+                    storage["studentNumber"] = document.getElementById("studentNumber").value;
+                    storage["name"] = document.getElementById("name").value;
+                }
+                $(window).attr("location", '/Login/ChooseSchool_province');
+            })
+            var data0 = { userNumber: window.localStorage.getItem("studentNumber"), name: window.localStorage.getItem("name"), school: window.localStorage.getItem("school"), type:0 };           
+            $("#confirm").click(function () {
+                var token = window.localStorage.getItem("jwt");
+                $.ajax({
+                    type: 'PUT',
+                    url: "/api/me",
+                    data: JSON.stringify(data0),
+                    contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
+                    dataType: "json",
+                    success: function (data)
+                    {
+                        window.localStorage.setItem('jwt', data.jwt);
+                        window.localStorage.setItem('id', data.id);
+                        window.localStorage.setItem('type', data.type);
+                        alert('绑定成功');
+                        $(window).attr("location", '/Login/StudentMainUI');
+
+                    },
+                    error: function (data) {
+                        alert(data.responseText);
+                    }
+                })
+            })
+        });
+    </script>
+</head>
+<body class="body">
+    <div class="PictureDiv">
+        <!-- 背景图的div -->
+        <img class="bulb" src="~/images/Theme/bulb.png" />
+        <img src="~/images/Theme/background.jpg" class="Picture" />
+        <div class="title">请先绑定您的账号</div>
+    </div>
+    <div class="hrDiv"></div>
+    <div class="mainView">
+        <div class="studentID">学号 :</div>
+        <input class="inputstudentID" type="text" id="studentNumber"/>
+        <img class="tipIcon" src="~/images/Theme/warning.png"/>
+        <div class="tipFont">提交后不能修改</div>
+        <div class="Name">姓名 :</div>
+        <input class="inputName" type="text" id="name"/>
+        <div class="school">学校 :</div>
+        <input class="inputSchool" id="school"/>
+        <img class="selectSchoolIcon" id="chooseschool"src="~/images/Theme/ninedot.png"/>
+        <div class="comfirmDiv">
+            <button class="confirmButton" id="confirm">绑定</button>
+        </div>
+    </div>
+</body>
+</html>
+
+
+

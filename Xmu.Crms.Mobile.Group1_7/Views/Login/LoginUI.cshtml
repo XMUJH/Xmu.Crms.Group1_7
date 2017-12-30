@@ -1,0 +1,98 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="~/css/LoginUI.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#login").click(function () {
+                var token = window.localStorage.getItem("jwt");
+                var data0 = { phone_id: document.getElementById("phone_id").value, password: document.getElementById("password").value }                
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/me/signin",
+                    data: JSON.stringify(data0),
+                    contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
+                    dataType: "json",
+                    success: function (data)
+                    {
+                        if (data.type == "teacher")
+                        {
+                            alert('登录成功');
+                            if (!window.localStorage)
+                            {
+                                alert("浏览器支持localstorage");
+                            }
+                            else
+                            {
+                                window.localStorage.setItem('jwt', data.jwt);
+                                window.localStorage.setItem('id', data.id);
+                                window.localStorage.setItem('type', data.type);
+                            }
+                            $(window).attr("location", '/Login/TeacherMainUI');
+                            }
+                        else
+                        {
+                            alert('登录成功');
+                            if (!window.localStorage)
+                            {
+                                alert("浏览器支持localstorage");
+                            }
+                            else
+                            {
+                                window.localStorage.setItem('jwt', data.jwt);
+                                window.localStorage.setItem('id', data.id);
+                                window.localStorage.setItem('type', data.type);
+                            }
+                            $(window).attr("location", '/Login/StudentMainUI');
+                        }
+                    },
+                    error: function (data)
+                    {
+                        alert(data.responseText);
+
+                    }
+                })
+            })
+            $("#register_first").click(function ()
+            {
+                $(window).attr("location", '/Login/RegisterUI');
+            })
+        });
+    </script>
+</head>
+<body class="body">
+    <div class="PictureDiv">
+        <!-- 背景图的div -->
+        <img class="bulb" src="~/images/Theme/bulb.png" />
+        <img src="~/images/Theme/background.jpg" class="Picture" />
+        <div class="title">请先登录</div>
+    </div>
+    <div class="hrDiv"></div>
+    <div class="mainView">
+        <div class="phoneID">手机号 :</div>
+        <input class="inputPhoneID" id="phone_id">
+        <div class="password">密码 :</div>
+        <input class="inputPassword" id="password" type="password">
+        <div class="comfirmDiv">
+            <button class="confirmButton" id="login">登录</button>
+        </div>
+        <div class="tip1">还没有账号？</div>
+        <div class="tip2" id="register_first">请先注册</div>
+    </div>
+</body>
+</html>
+
+
+

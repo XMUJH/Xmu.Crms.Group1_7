@@ -1,0 +1,69 @@
+﻿
+@{
+    Layout = null;
+}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Score</title>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link href="@Url.Content("~/css/GradePresentation.css")" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                type: 'GET',
+                url: "/api/seminar/20/group",
+                contentType: "application/json; charset=utf-8",
+                data: {
+                    "gradeable": "true",
+                    "classId": 20
+                },
+                success: function (data, status) {
+                    for (var i in data.Data) {
+                        var col = "<div class='GradeDiv'><span class='GroupNum'>"+data.Data[i].name
+                            + "</span> <div> <img id='off' src='/images/themes/heart_empty.png' class='GroupGradeIcon'/>"
+                            + "<img id='on' style='display:none;' src='/images/themes/heart_chosen.png' class='GroupGradeIcon'/></div>"
+                            + "<div> <img id='off' src='/images/themes/heart_empty.png' class='GroupGradeIcon'/>"
+                            + "<img id='on' style='display:none;' src='/images/themes/heart_chosen.png' class='GroupGradeIcon'/></div>"
+                            + "<div> <img id='off' src='/images/themes/heart_empty.png' class='GroupGradeIcon'/>"
+                            + "<img id='on' style='display:none;' src='/images/themes/heart_chosen.png' class='GroupGradeIcon'/></div>"
+                            + "<div> <img id='off' src='/images/themes/heart_empty.png' class='GroupGradeIcon'/>"
+                            + "<img id='on' style='display:none;' src='/images/themes/heart_chosen.png' class='GroupGradeIcon'/></div>"
+                            + "<div> <img id='off' src='/images/themes/heart_empty.png' class='GroupGradeIcon'/>"
+                            + "<img id='on' style='display:none;' src='/images/themes/heart_chosen.png' class='GroupGradeIcon'/></div></div>"
+                        $("#list").append(col);
+                    }
+                }
+            });
+            function hclick() {
+                $(this).parent().parent().children().children("#on").hide();
+                $(this).parent().parent().children().children("#off").show();
+                $(this).parent().children().toggle();
+                $(this).parent().prevAll().children().toggle();
+            }
+            $(".blueBigBtn").click(function () {
+                $(this).remove();
+                $("#list").off('click', '.GroupGradeIcon', hclick)
+                $("#title").text("您的打分结果");
+            });
+            $("#list").on('click', '.GroupGradeIcon', hclick)
+        });
+    </script>
+</head>
+<body class="fullbackground">
+    <div class="blueUsersDiv">
+        <img src="~/images/themes/user.png" class='blueUsersIcon' />
+    </div>
+    <!--设置上方的字体-->
+    <div class="blueUsersDiv2">
+        <strong id="title" class="blueUsersFont">请为别的小组打分</strong>
+    </div>
+    <!--细线，hr不好设置css，用一个高度很小的div来代替-->
+    <div class="hrDiv"></div>
+    <div id="list"></div>
+    <button class="blueBigBtn">提交</button>
+</body>
+</html>

@@ -1,0 +1,72 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="~/css/RegisterUI.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var token = window.localStorage.getItem("jwt");
+            $("#register").click(function () {
+                var data0 = { phone_no: document.getElementById("phone_no").value, password: document.getElementById("password").value, password_confirm: document.getElementById("password_confirm").value };  
+                if (data0.password != data0.password_confirm) alert('两次输入密码不一致');
+                else {
+                    $.ajax({
+                        type: 'POST',
+                        url: "/api/me/register",
+                        data: JSON.stringify(data0),
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (data, status) {
+                            alert('注册成功');
+                            window.localStorage.setItem('jwt', data.jwt);
+                            window.localStorage.setItem('id', data.id);
+                            window.localStorage.setItem('type', data.type);
+                            $(window).attr("location", '/Login/ChooseCharacter');
+                        },
+                        error: function (data) {
+                            alert(data.responseText);
+                        }
+                    })
+                }
+            })
+        });
+    </script>
+</head >
+<body class="body">
+    <div class="PictureDiv">
+        <!-- 背景图的div -->
+        <img class="bulb" src="~/images/Theme/bulb.png" />
+        <img src="~/images/Theme/background.jpg" class="Picture" />
+        <div class="title">注册</div>
+    </div>
+    <div class="hrDiv"></div>
+         <div class="mainView">
+         <div class="studentID">手机号 :</div>
+         <input class="inputstudentID" id="phone_no" name="phone_no"/>
+         <img class="tipIcon" src="~/images/Theme/warning.png"/>
+         <div class="tipFont">提交后不能修改</div>
+         <div class="Name">密码 :</div>
+         <input class="inputName" id="password" name="password" type="password"/>
+         <div class="school">确认密码 :</div>
+         <input class="inputSchool" id="password_confirm" name="password_confirm" type="password"/>         
+         <div class="comfirmDiv">
+              <button class="confirmButton" id="register">注册</button>
+         </div>
+    </div>
+</body>
+</html>
+
+
+
+

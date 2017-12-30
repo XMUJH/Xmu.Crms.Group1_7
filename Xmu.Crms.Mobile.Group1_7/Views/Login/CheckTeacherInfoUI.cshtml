@@ -1,0 +1,88 @@
+﻿@{
+    Layout = null;
+}
+
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0"
+                                    >
+<title>课程管理系统</title>
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link href="~/css/CheckTeacherInfo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var token = window.localStorage.getItem("jwt");
+            $.ajax({
+                type: 'GET',
+                url: "/api/me",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (data)
+                {
+                    $("#name").text("姓名：" + data.name);
+                    $("#teacherID").text("教工号：" + data.number);
+                    $("#phone_no").text("手机号：" + data.phone);
+                    $("#ID").text("教工号：" + data.number);
+                    $("#school").text("学校：" + data.school.name);
+                    $("#name0").text("姓名：" + data.name);
+                },
+                error: function (data) {
+                    alert(data.responseText);
+
+                }
+            })
+            $("#quit").click(function ()
+            {
+                var confirmChoose = window.confirm("确认退出登录？");
+                if (confirmChoose) $(window).attr("location", '/Login/LoginUI');
+            })
+            $("#unbind").click(function ()
+            {
+                var confirmChoose = window.confirm("确定要解绑吗？");
+                if (confirmChoose) {
+                    $.ajax({
+                        type: 'PUT',
+                        url: "/api/me",
+                        data: "",
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (data)
+                        {
+                            $(window).attr("location", '/Login/TeacherBindingUI');
+                        },
+                        error: function (data)
+                        {
+                            alert(data.responseText);
+                        }
+                    })
+                }
+            })
+    });
+    </script>
+</head>
+<body class="body">
+	<div class="PictureDiv"><!-- 背景图的div -->
+		<img class="user" src="~/images/Theme/user.png" />  
+		<div class="unbindTip">点击头像修改</div>
+		<img src="~/images/Theme/background.jpg" class="Picture"/>  
+		<div class="name" id="name"></div> 
+		<div class="teacherID" id="teacherID"></div> 
+	</div>
+	<div class="phone1" id="phone_no"></div>
+	<div class="ID" id="ID"></div>
+	<div class="school" id="school"></div>
+	<div class="name1" id="name0"></div>
+	<button class="exitBtn" id="quit">退出登录</button>
+	<button class="UnbindBtn" id="unbind">解绑账号</button>
+</body>	
+</html>
+
+
+

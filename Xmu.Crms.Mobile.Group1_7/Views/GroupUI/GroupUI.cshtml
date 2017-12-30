@@ -1,0 +1,191 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>Untitled Document</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <link href="~/css/GroupList.css" rel="stylesheet" type="text/css">
+    
+    <script>
+        var userIden = "leader";
+        $(document).ready(function ()
+        {
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/group/13?embedTopics=true&embedGrade=true",
+                    data:"",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result)
+                    {
+                        if (result.Data.leader.id != "")
+                        {
+                            with (document.getElementById("leaderIcon").style) { (display = "") }
+                            with (document.getElementById("becomeLeader").style) { (display = "none") }
+                            with (document.getElementById("hit").style) { (display = "none") }
+                            $.each(result.Data.members, function (i, value)
+                            {
+                                if (value.id == "24320152202746") userIden = "member";
+                            });
+                            if (userIden == "leader")
+                            {
+                                with (document.getElementById("resign").style) { (display = "") }
+                                if (result.Data.topics.id == "")
+                                {
+                                    with (document.getElementById("topic").style) { (display = "none") }
+                                    with (document.getElementById("chooseTopic").style) { (display = "") }
+                                }
+                                else
+                                {
+                                    with (document.getElementById("topic").style) { (display = "") }
+                                    with (document.getElementById("chooseTopic").style) { (display = "none") }
+                                }
+                            }
+                            if (userIden == "member")
+                            {
+                                with (document.getElementById("resign").style) { (display = "none") }
+                                if(result.Data.topics.id == "")
+                                {
+                                    with (document.getElementById("topic").style) { (display = "none") }
+                                    with (document.getElementById("chooseTopic").style) { (display = "none") }
+                                }
+                                else
+                                {
+                                    with (document.getElementById("topic").style) { (display = "") }
+                                    with (document.getElementById("chooseTopic").style) { (display = "none") }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            with (document.getElementById("leaderIcon").style) { (display = "none") }
+                            with (document.getElementById("becomeLeader").style) { (display = "") }
+                            with (document.getElementById("hit").style) { (display = "") }
+                            with (document.getElementById("chooseTopic").style) { (display = "none") }
+                            if (result.Data.topics.id == "")
+                            {
+                                with (document.getElementById("topic").style) { (display = "none") }
+                            }
+                            else 
+                            {
+                                with (document.getElementById("topic").style) { (display = "") }
+                            }
+                            with (document.getElementById("resign").style) { (display = "none") }
+                        }
+                        $("#topicContent").text("选题: " + result.Data.topics.id + result.Data.topics.name);
+                        $("#leader").text(result.Data.leader.name + "\n" + result.Data.leader.id);
+                        $.each(result.Data.members, function (i, value)
+                        {
+                            var imgObj = " <img src=\"\\images\\GroupList\\user.png\"/>";
+                            $("#members").append('<div class="block">' + '<div class="panel-body">' + '<div class="column1">' + imgObj + '</div>' + ' <div class="column2">' + value.name + "\n" + value.id + '</div>' + '</div>' + '</div>');
+                        });
+                        if (window.localStorage.getItem("currentGM") == "fixed")
+                        {
+                            with (document.getElementById("groupingMethod1").style) { (display = "none") }
+                            with (document.getElementById("groupingMethod2").style) { (display = "") }
+                        }
+                        else
+                        {
+                            with (document.getElementById("groupingMethod1").style) { (display = "") }
+                            with (document.getElementById("groupingMethod2").style) { (display = "none") }
+                        }
+                    }
+                })
+        })
+        $(document).on("click",".btnquit",function ()
+        {
+            $.ajax(
+                {
+                    type: 'PUT',
+                    url: "/api/group/13/resign?id=\"24320152202746\"",
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result)
+                    {
+                        //$(window).attr("location", '/FixedGroup/FixedGroupLeaderUI2');
+                        with (document.getElementById("resign").style) { (display = "none") }
+                        with (document.getElementById("leaderIcon").style) { (display = "none") }
+                        with (document.getElementById("becomeLeader").style) { (display = "") }
+                        with (document.getElementById("hit").style) { (display = "") }
+                    }
+
+                })
+        })
+        $(document).on("click", ".btntopic", function ()
+        {
+            $(window).attr("location", '/GroupUI/GroupChooseTopicUI');
+            with (document.getElementById("topic").style) { (display = "") }
+            with (document.getElementById("chooseTopic").style) { (display = "none") }
+        })
+        $(document).on("click", ".btnleader", function () {
+            $.ajax(
+                {
+                    type: 'PUT',
+                    url: "/api/group/13/assign?id=\"24320152202746\"",
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result)
+                    {
+                        with (document.getElementById("resign").style) { (display = "") }
+                        with (document.getElementById("leaderIcon").style) { (display = "") }
+                        with (document.getElementById("becomeLeader").style) { (display = "none") }
+                        with (document.getElementById("hit").style) { (display = "none") }
+                    }
+
+                })
+        })
+    </script>
+</head>
+<body class="fullbackground">
+    <div class="columndisplay">
+        <img class="UsersIcon" src="~/images/GroupList/users.png"/>
+        <label class="seminarblackword" id="groupingMethod1">讨论课4<br/>随机分组</label>
+        <label class="seminarblackword" id="groupingMethod2">讨论课4<br/>固定分组</label>
+    </div>
+
+    <div class="whiteword">
+        <div class="panel-body">
+            <div class="column4">分组信息：</div>
+            <div class="column3"><button class="btnquit" id="resign">辞职</button></div>
+        </div>
+    </div>
+
+    <div class="block">
+        <div class="panel-body">
+            <div class="column1"><img src="~/Content/GroupList/user.png"/></div>
+            <div class="column2" id="leader"></div>
+            <div class="column3 rightblueword" id="leaderIcon">队长</div>
+        </div>
+    </div>
+   
+    <div id="members"></div>
+
+    <div class="whiteword" id="topic">
+        <div class="panel-body">
+            <div id="topicContent">选题：</div>
+        </div>
+    </div>
+
+    <div class="middlediv">
+        <button class="btntopic" id="chooseTopic">选择主题</button>
+        <button class="btnleader" id="becomeLeader">成为队长</button>
+        <p class="middlegreyword" id="hit">您的队伍还没有队长，您可以选择成为队长。</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="~/css/RollStartCallUI.css"/>
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: "/api/class/23",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $("#className").text(result.Data.name);
+                    $("#numStudent").text("学生总数：" + result.Data.numStudent);
+                }
+            })
+            $.ajax({
+                type: "GET",
+                url: "/api/seminar/52/class/32/attendance",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $("#numPresent").append("已签到学生：" + result.Data.numPresent + "/" + result.Data.numStudent);
+                }
+            })
+        });
+        //签到名单Button
+        $(document).on("click", ".blueBigBtn", function () {
+            $.ajax({
+                type: "GET",
+                url: "/api/class/23",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $(window).attr("location", "/Teacher/FixedRollCallEndUI");
+                }
+            })
+        });
+        //查看分组Button
+        $(document).on("click", ".greenBigBtn", function () {
+            $.ajax({
+                type: "GET",
+                url: "/api/class/23",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $(window).attr("location", "/Teacher/FIxedGroupInfoUI");
+                }
+            })
+        });
+    </script>
+</head >
+            <body>
+
+                <!--设置左上角的蓝色板-->
+    <div class="blueBoardDiv">
+                    <img src="~/images/themes/blueBoard.png" class='blueBoardIcon' />
+                </div>
+
+
+                <!--班级1 的字样-->
+    <div class='classNameDiv' id="className"></div>
+
+                <!--学生总数：40 的字样-->
+    <div class='studentSumDiv' id="numStudent"></div>
+
+                <!--细线，hr不好设置css，用一个高度很小的div来代替-->
+    <div class="hrDiv"></div>
+
+                <!--已签到的学生以及那个icon,当签到开始及结束时，这个
+    部分在中央。当签到开始后结束前，这部分在左边，见.studentNum2。-->
+
+    <div class="studentNum" id="numPresent">
+                    <img src="~/images/themes/users.png" class="usersIcon" />
+    </div>
+
+                <!--下面是button，分为BigBtn和SmallBnt,只有正在签到时
+    的 签到名单按钮 是SmallBnt。 当使用greyBigBtn的时候要加
+    上提示语。-->
+    <div>
+                    <button type="button" class="blueBigBtn" >签到名单</button>
+                </div>
+
+                <div>
+                    <button type="button" class="greenBigBtn">查看分组</button>
+                </div>
+
+            </body>
+</html >

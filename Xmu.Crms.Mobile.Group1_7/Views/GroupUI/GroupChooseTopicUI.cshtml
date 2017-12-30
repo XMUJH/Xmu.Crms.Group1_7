@@ -1,0 +1,109 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>Untitled Document</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <link href="~/css/GroupChooseTopicUI.css" rel="stylesheet" type="text/css">
+    <script>
+        $(document).ready(function ()
+        {
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/seminar/9/topic",
+                    data:"",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result)
+                    {
+                        var c = document.cookie.split(";")[0].split("=")[1];
+                        $.each(result.Data, function (i, value)
+                        {
+                            var imgObj = "<img src=\"/images/GroupChooseTopicUI/nine.png\" class=\"nineIcon\" />";
+                            if (value.groupLeft >= 2) $("#topics").append('<div class="blueTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '<span class="leftNumWhite">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' + imgObj + '</div>');
+                            if (value.groupLeft == 1) $("#topics").append('<div class="blueTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '<span class="leftNumRed">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' + imgObj + '</div>');
+                            if (value.groupLeft == 0) $("#topics").append('<div class="greyTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '<span class="leftNumWhite">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' + imgObj + '</div>');
+                            if (c==i)
+                            {
+                                $("#topics").append('<div class="topicDescribeDiv">' + '<span class="topicDescribeTitle">' + value.name + '</span>' + '<span class="topicDescribeText">' + value.description + '</span>' + '</div>');
+                            }
+                        });
+                    }
+                })
+        })
+        $(document).on("click", ".blueTopicDiv", function ()
+        {
+            var confirmChoose = window.confirm("确定选择此话题吗(一旦选定不能修改)");
+            if (confirmChoose)
+            {
+                $.ajax(
+                    {
+                        type: 'POST',
+                        url: "/api/group/13/topic",
+                        data: "",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (result)
+                        {
+                            $(window).attr("location", '/GroupUI/GroupUI');
+                        }
+                    })
+            }
+        })
+        $(document).on("click", ".greyTopicDiv", function ()
+        {
+           window.alert("此话题选择组数已满");
+        })
+        $(document).on("click", ".nineIcon", function (event)
+        {
+            event.stopPropagation();
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/topic/9",
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result)
+                    {
+                        var i;
+                        if (result.Data.serial == "A") i = 0;
+                        if (result.Data.serial == "B") i = 1;
+                        if (result.Data.serial == "C") i = 2;
+                        var c = document.cookie.split(";")[0].split("=")[1];
+                        if (c == i) i = -1;
+                        document.cookie = "clicked=" + i;
+                        $(window).attr("location", '/GroupUI/GroupChooseTopicUI');
+                    }
+
+                })
+        })
+    </script>
+</head>
+<body>
+    <!--设置左上角的usersIcon-->
+    <div class="blueUsersDiv">
+        <img src="~/images/GroupChooseTopicUI/users.png" class='blueUsersIcon' />
+        <strong class="title">请为您的队伍选题</strong>
+    </div>
+
+    <!--细线，hr不好设置css，用一个高度很小的div来代替-->
+    <div class="hrDiv">
+    </div>
+    <div id="topics"></div>
+    
+</body>
+</html>

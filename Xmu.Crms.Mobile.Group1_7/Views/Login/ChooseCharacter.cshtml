@@ -1,0 +1,67 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0"
+                                    >
+<title>课程管理系统</title>
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link href="~/css/ChooseCharacter.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#teacher").click(function () {
+                $.ajax({
+                    success: function (data) {
+                        if (!window.localStorage) {
+                            alert("浏览器支持localstorage");
+                        } else {
+                            var storage = window.localStorage;
+
+                            storage["user"] = "Teacher";
+                        }
+                        $(window).attr("location", '/Login/TeacherBindingUI');
+                    }
+                })
+            })
+            $("#student").click(function () {
+                $.ajax({
+                    success: function (data) {
+                        if (!window.localStorage) {
+                            alert("浏览器支持localstorage");
+                        } else {
+                            var storage = window.localStorage;
+
+                            storage["user"] = "Student";
+                        }
+                        $(window).attr("location", '/Login/StudentBindingUI');
+                    }
+                })
+            })                          
+        });
+    </script>
+</head>
+	<body class="body">
+	<div class="PictureDiv"><!-- 背景图的div -->
+		<img class="bulb" src="~/images/Theme/bulb.png" />  
+		<img src="~/images/Theme/background.jpg" class="Picture"/>  
+		<div class="title" >请选择您的账号类型</div> 
+	</div>
+	<div class="hrDiv"></div>
+<div class="teacherDiv">
+<button class="teacherButton" id="teacher">老师</button>
+</div>
+<div class="studentDiv">
+<button class="studentButton" id="student">学生</button>
+</div>
+</body>
+</html>
+
+
+

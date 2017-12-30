@@ -1,0 +1,173 @@
+﻿@{ 
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="~/css/GroupInfoUI2.css">
+    <script>       
+        $(document).ready(function () {
+
+            function addStu() {
+                $("#new").modal("show");
+            }
+            $("div").on('click', '.addIcon', addStu);
+            $.ajax({
+                type: "GET",
+                url: "/api/seminar/32/group?gradeable=true&classId=23",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $.each(result.Data, function (i, value) {
+                        var ii = i;
+                        $("#groups").append(
+                            '<div onclick="showMembers(' + ii + ')" class=\"studentListBarDiv\">' +
+                            '<span class=\"groupName\">' + value.name + '</span>' +
+                            '<span class=\"groupTopics\">选题：' + value.topics.name + '</span>' +
+                            '</div >'
+                        );
+                        getMember(value, ii);
+                    })
+                }
+            })
+            $.ajax({
+                type: 'GET',
+                url: "/api/seminar/52/class/32/attendance/late",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $.each(result.Data, function (i, value) {
+                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                        if (i % 2 == 0)
+                            $("#lateStudents").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                        else
+                            $("#lateStudents").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                    });
+                }
+            })
+        })
+        function getMember(group, ii) {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/api/group/28?embedTopics=true&embedGrade=false",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var left = true;
+                    $("#groups").append('<div id=\"members_' + ii + '\"hidden/>');
+
+                    if (result.Data.leader != "undefined") {
+                        $("#members_" + ii).append(
+                            '<div class=\'studentLeftBlock\'>' +
+                            '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                            '<span class=\"studentName\">' + result.Data.leader.name + '</span >' +
+                            '</div>'
+                        );
+                        left = false;
+                    }
+                    $.each(result.Data.members, function (i, member) {
+                        if (left == true) {
+                            $("#members_" + ii).append('<div class=\'studentLeftBlock\'>' +
+                                '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                '<span class=\"studentName\">' + member.name + '</span></div>');
+                            left = false;
+                        }
+                        else {
+                            $("#members_" + ii).append('<div class=\'studentRightBlock\'>' +
+                                '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                '<span class=\"studentName\">' + member.name + '</span></div>');
+                            left = true;
+                        }
+                    })
+                    //空白添加学生的块
+                    if (left == true) {
+                        $("#members_" + ii).append('<div class=\'studentLeftBlock\'>' +
+                            '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\'/>');
+                        left = false;
+                    }
+                    else {
+                        $("#members_" + ii).append('<div class=\'studentRightBlock\'>' +
+                            '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\'/>'); 
+                        left = true;
+                    }
+                }
+            })
+        }
+
+        function showMembers(i) {
+            $("#members_" + i).toggle("");
+        }
+
+
+
+
+    </script>
+
+
+
+
+</head>
+<body>
+    <!--设置左上角的usersIcon-->
+    <div class="blueUsersDiv">
+        <img src="~/images/themes/users.png" class="blueUsersIcon"/>
+    </div>
+
+    <div class="title">队伍信息</div>
+
+    <!--细线，hr不好设置css，用一个高度很小的div来代替-->
+    <div class="hrDiv">
+    </div>
+
+    <!--队伍列表-->
+    <div id="groups">
+
+    </div>
+
+    <!--学生块，分为左边的和右边的，增加学生的时候选择好左边或者
+    右边后直接复制就好，之后在span下面修改学生名字-->
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade modalstyle" id="new">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title modaltitle" id="myModalLabel">学生添加</h4>
+                </div>
+                <div class="modal-body modalbody">
+                    <div class="modallist">张三</div>
+                    <div class="modallist">李四</div>
+                    <div class="modallist">王五</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default modalclosebutton" data-dismiss="modal">关闭</button>
+                    <button id="confirm" type="button" class="btn btn-primary modalconfirmbutton">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--迟到学生上面那个蓝色的bar-->
+    <div class='studentNoCallBarDiv'>
+        <span class="barText">未签到学生</span>
+    </div>
+
+    <!--未签到学生-->
+    <div id="lateStudents">
+
+    </div>
+</body>
+</html>

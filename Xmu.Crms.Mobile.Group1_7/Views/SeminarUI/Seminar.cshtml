@@ -1,0 +1,105 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>Untitled Document</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <link href="~/css/Seminar.css" rel="stylesheet" type="text/css">
+    <script>
+        $(document).ready(function ()
+        {
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/seminar/13",
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result)
+                    {
+                      //  var myDate = getNowFormatDate();
+                       // if (CompareDate(myDate, result.Data.startTime) && CompareDate(result.Data.endTime, myDate))
+                       // {
+                            document.getElementById("CallTheRoll").setAttribute("class", "CallBox");
+                            document.getElementById("gradeOthers").setAttribute("class", "ScoreBox");
+                      //  }
+                        //else
+                       // {
+                           // document.getElementById("CallTheRoll").setAttribute("class", "greyCallBox");
+                           // document.getElementById("gradeOthers").setAttribute("class", "greyScoreBox");
+                       // }
+                       // if (result.groupingMethod == "fixed")
+                        //{
+                            var temp =window.localStorage;
+                            temp["currentGM"] = result.Data.groupingMethod;
+                            document.getElementById("groupArea").setAttribute("class", "GroupBox");
+                       // }
+                       // else
+                        //{
+                         //   document.getElementById("groupArea").setAttribute("class", "greyGroupBox");
+                       // }
+                    }
+                })
+        })
+        $(document).on("click", ".GroupBox", function ()
+        {
+            $(window).attr("location", '/GroupUI/GroupUI');
+        })
+        $(document).on("click", ".CallBox", function ()
+        {
+            // $(window).attr("location", '/Student/StudentRollCallUI');
+            window.location.href = "/Student/StudentRollCallUI";
+        })
+        $(document).on("click", ".ScoreBox", function ()
+        {
+            $(window).attr("location", '/Student/Score');
+        })
+        function CompareDate(d1, d2)
+        {
+            return ((new Date(d1.replace(/-/, "\/"))) > (new Date(d2.replace(/-/, "\/"))));
+        }
+        function getNowFormatDate()
+        {
+            var date = new Date();
+            var seperator1 = "-";
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var strDate = date.getDate();
+            if (month >= 1 && month <= 9) {
+                month = "0" + month;
+            }
+            if (strDate >= 0 && strDate <= 9) {
+                strDate = "0" + strDate;
+            }
+            var currentdate = year + seperator1 + month + seperator1 + strDate;
+            return currentdate;
+        }
+    </script>
+</head>
+<body class="body">
+    <div class="topBox">
+        <span class="title"> OOAD</span>
+        <span class="title2"> 讨论课4</span>
+    </div>
+    <div id="gradeOthers">
+        <span class="ScoreText">打分</span>
+    </div>
+    <div id="CallTheRoll">
+        <span class="CallText">签到</span>
+    </div>
+    <div id="groupArea">
+        <span class="GroupText">组队和选题</span>
+    </div>
+</body>
+</html>

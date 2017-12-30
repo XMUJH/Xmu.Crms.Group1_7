@@ -1,0 +1,69 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>课程管理系统</title>
+    <link href="~/css/ChooseSchool.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function ()
+        {
+            var token = window.localStorage.getItem("jwt");
+            $("#province").text(window.localStorage.getItem("province"));                  
+            $.ajax({
+                type: 'GET',
+                url: "/api/school/city/province=" + window.localStorage.getItem("province"),
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (data) {
+                    $.each(data, function (i, value) {
+                        $("#citys").append('<li id=\"ptr\" class=\"ptr\">' + value + '</li>');
+                    });
+                },
+                 error: function (data) {
+                    alert(data.responseText);
+                }
+            })
+            $("#school").click(function () {
+                alert('请先选择城市');
+            })
+            $("#province").click(function ()
+            {
+                window.localStorage.setItem('province',"");
+                $(window).attr("location", '/Login/ChooseSchool_province');  
+            })
+        });
+        $(document).on("click", ".ptr", function ()
+        {
+            window.localStorage.setItem('city', $(this).text());
+            $(window).attr("location", '/Login/ChooseSchool_school');
+        });
+    </script>
+</head>
+<body>
+    <div class="topbox">
+        <div class="fixTop">
+            <img src="~/images/Theme/bulb.png" class="bulbimg" />
+            <strong class="title0">请选择您的学校</strong>
+            <img class="img" src="~/images/Theme/background.jpg" />
+        </div>
+        <!--这个class与js有关 实现列表切换-->
+        <div>
+            <div class="fixTop title">
+                <div id="province"></div>
+                <div id="city" class="cur">州市</div>
+                <div id="school">学校</div>
+            </div>
+            <div class="list">
+                <ol id="citys"></ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

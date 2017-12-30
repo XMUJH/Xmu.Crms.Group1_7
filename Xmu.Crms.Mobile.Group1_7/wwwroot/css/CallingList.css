@@ -1,0 +1,104 @@
+﻿@charset "utf-8";
+/* 背景色 */
+
+body {
+    background: rgba(102, 204, 255, 0.5);
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* 左上角的蓝色板的容器*/
+
+.blueBoardDiv {
+    width: 34%;
+    height: 34%;
+    float: left;
+    padding-top: 7%;
+    padding-left: 5%;
+    margin-left: 4%;
+}
+
+/* 左上角的蓝色板图标大小*/
+
+.blueBoardIcon {
+    width: 120%;
+    height: 100%;
+}
+
+/* 班级名的位置、字体等样式 */
+
+.classNameDiv {
+    margin-top: 16%;
+    margin-left: 1%;
+    margin-right: 13%;
+    width: 40%;
+    height: 7.5%;
+    font-size: 50px;
+    float: right;
+    padding-left: 8%;
+}
+
+/* 签到人数的位置、字体等样式*/
+
+.studentSumDiv {
+    font-size: 23px;
+    width: 46.6%;
+    height: 6%;
+    float: right;
+    margin-right: 0%;
+    padding-top: 3%;
+    padding-left: 2%;
+}
+
+/*学生名单上面蓝色的bar*/
+.studentListBarDiv {
+    background-color: #6cf;
+    float: right;
+    width: 90%;
+    height: 5%;
+    border-radius: 6px;
+    font-size: 17px;
+    color: black;
+    margin-right: 5%;
+    margin-top: 13%;
+    padding-bottom: 1%;
+}
+
+/*左边的学生块*/
+.studentLeftBlock {
+    background-color: #fff;
+    width: 45%;
+    float: left;
+    border-radius: 6px;
+    color: black;
+    height: 7.5%;
+    margin-left: 5%;
+}
+
+/*右边的学生块*/
+.studentRightBlock {
+    background-color: #fff;
+    width: 45%;
+    float: right;
+    border-radius: 6px;
+    color: black;
+    height: 7.5%;
+    margin-right: 5%;
+}
+
+/*学生前面的icon*/
+.userIcon {
+    float: left;
+    width: 30%;
+    height: 100%;
+}
+
+/*学生名字的文本*/
+.studentName {
+    float: left;
+    margin-left: 20%;
+    margin-top: 8%;
+    font-size: 20px;
+}

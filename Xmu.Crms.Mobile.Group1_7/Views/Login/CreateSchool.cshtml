@@ -1,0 +1,63 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="~/css/CreateSchoolUI.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function ()
+        {
+            var token = window.localStorage.getItem("jwt");
+            $("#province").text("省份:" + window.localStorage.getItem("province") + "省");
+            $("#city").text("城市:" + window.localStorage.getItem("city") + "市");
+            $("#create").click(function ()
+            {
+                var data0 = { schoolname: document.getElementById("schoolname").value };
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/school",
+                    data: JSON.stringify(data0),
+                    contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
+                    dataType: "json",
+                    success: function (data) {
+                        alert('创建成功');  
+                        $(window).attr("location", '/Login/ChooseSchool_school');
+                    },
+                    error: function (data) {
+                        alert(data.responseText);
+                    }
+                })
+            })
+        });
+    </script>
+</head>
+<body class="body">
+    <div class="PictureDiv">
+        <!-- 背景图的div -->
+        <img class="bulb" src="~/images/Theme/bulb.png" />
+        <img src="~/images/Theme/background.jpg" class="Picture" />
+        <div class="title">创建学校</div>
+    </div>
+    <div class="hrDiv"></div>
+    <!--细线，hr不好设置css，用一个高度很小的div来代替-->
+    <div class="mainView">
+        <span class="font1" id="province"></span>
+        <span class="font2" id="city"></span>
+        <span class="schoolName">学校名：</span>
+        <input class="inputSchool" id="schoolname"/>
+        <img src="~/images/Theme/warning.png" class="tipIcon" />
+        <span class="tipFont">提交后不能再修改</span>
+        <button class="createButton" id="create">创建</button>
+    </div>
+    </body>
+</html>

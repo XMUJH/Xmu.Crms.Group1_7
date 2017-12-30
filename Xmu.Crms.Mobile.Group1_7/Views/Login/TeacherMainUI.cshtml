@@ -1,0 +1,74 @@
+﻿@{
+    Layout = null;
+}
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="~/css/TeacherMainUI.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var token = window.localStorage.getItem("jwt");
+            $.ajax({
+                type: 'GET',
+                url: "/api/me",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (data) {
+                    $("#name").text("姓名：" + data.name);
+                    $("#teacherID").text("教工号：" + data.number);
+                },
+                error: function (data) {
+                    alert(data.responseText);
+                }
+            });
+            $.ajax({
+                type: 'GET',
+                url: "/api/course",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (data)
+                {
+                    $.each(data.Data, function (i, value) {
+                        $("#blueboxes").append('<div class=\"blueBox\">'+ '<div id=\"ptr\" class=\"text\">' + value.name + '</div>' +'</div >');
+                    });
+                },
+                error: function (data) {
+                    alert(data.responseText);
+                }
+            })
+            $("#personal_information").click(function () {
+                $(window).attr("location", '/Login/CheckTeacherInfoUI');
+            });
+            $(document).on("click", ".text", function ()
+            {
+                $(window).attr("location", '/Teacher/ClassManage');
+            });
+        });
+    </script>
+</head>
+<body class="body">
+    <div class="PictureDiv" id="personal_information">
+        <!-- 背景图的div -->
+        <img class="user" src="~/images/Theme/user.png" />
+        <img src="~/images/Theme/background.jpg" class="Picture" />
+        <div class="name" id="name"></div>
+        <div class="teacherID" id="teacherID"></div>
+    </div>
+
+    <div class="lowBox" id="blueboxes"></div>
+</body>
+</html>
+
+
+

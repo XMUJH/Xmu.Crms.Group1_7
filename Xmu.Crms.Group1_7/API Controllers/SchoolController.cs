@@ -51,7 +51,7 @@ namespace Xmu.Crms.Group1_7
         [HttpPost("api/school")]
         public IActionResult PostSeminar([FromBody]dynamic json)
         {
-            School school = new School { Name = json.schoolname };
+            School school = new School { Name = json.schoolname, Province = json.province, City = json.city };
             long schoolId = 0;
             try
             {

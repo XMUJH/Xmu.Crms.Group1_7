@@ -24,11 +24,13 @@
                 contentType: "application/json; charset=utf-8",
                 headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
-                success: function (data) {
+                success: function (data)
+                {
                     $("#name").text("姓名：" + data.name);
                     $("#studentID").text("学号：" + data.number);
                 },
-                error: function (data) {
+                error: function (data)
+                {
                     alert(data.responseText);
 
                 }
@@ -40,12 +42,15 @@
                 contentType: "application/json; charset=utf-8",
                 headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
-                success: function (data) {
-                    $.each(data.CourseSelections, function (i, value) {
+                success: function (data)
+                {
+                    $.each(data, function (i, value)
+                    {
                          $("#blueboxes").append('<div class=\"blueBox\">' + '<p id=\"ptr\" class=\"leftText\">' + value.courseName + '</p>' + '<p class=\"rightText\">' + '老师：' + value.courseTeacher + '</p>' + '</div >');
                      });
                 },
-                error: function (data) {
+                error: function (data)
+                {
                     alert(data.responseText);
                 }
             })

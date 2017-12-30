@@ -39,7 +39,7 @@
                 dataType: "json",
                 success: function (data)
                 {
-                    $.each(data.Data, function (i, value) {
+                    $.each(data, function (i, value) {
                         $("#blueboxes").append('<div class=\"blueBox\">'+ '<div id=\"ptr\" class=\"text\">' + value.name + '</div>' +'</div >');
                     });
                 },

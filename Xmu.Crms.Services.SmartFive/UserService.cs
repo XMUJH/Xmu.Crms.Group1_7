@@ -33,7 +33,7 @@ namespace Xmu.Crms.Services.SmartFive
                          Avatar = user.Avatar,
                          Password = user.Password,
                          Name = user.Name,
-                         School = new School { Id=user.School.Id},
+                         SchoolId = user.SchoolId,
                          Gender = user.Gender,
                          Type = user.Type,
                          Number = user.Number,
@@ -302,7 +302,7 @@ namespace Xmu.Crms.Services.SmartFive
                         select i).SingleOrDefault();
             if (user.Gender != null) u.Gender = user.Gender;
             if (user.Education != null) u.Education = user.Education;
-            //_db.SaveChanges();
+            _db.SaveChanges();
         }
     }
 }

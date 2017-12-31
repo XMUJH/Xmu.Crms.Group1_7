@@ -30,6 +30,8 @@
                     alert(data.responseText);
                 }
             });
+            var array1 = new Array();
+            var array2 = new Array();
             $.ajax({
                 type: 'GET',
                 url: "/api/course",
@@ -39,7 +41,10 @@
                 dataType: "json",
                 success: function (data)
                 {
-                    $.each(data, function (i, value) {
+                    $.each(data, function (i, value)
+                    {
+                        array1.push(value.id);
+                        array2.push(value.name);
                         $("#blueboxes").append('<div class=\"blueBox\">'+ '<div id=\"ptr\" class=\"text\">' + value.name + '</div>' +'</div >');
                     });
                 },
@@ -50,8 +55,16 @@
             $("#personal_information").click(function () {
                 $(window).attr("location", '/Login/CheckTeacherInfoUI');
             });
-            $(document).on("click", ".text", function ()
+            $(document).on("click", ".blueBox", function ()
             {
+                var a = this.getElementsByClassName(".text").text();
+                for (var x in array2) {
+                    if (a == array2[x]) {
+                        window.localStorage.setItem('courseID', array1[x]);
+                        break;
+                    }
+
+                }
                 $(window).attr("location", '/Teacher/ClassManage');
             });
         });

@@ -64,10 +64,13 @@
             })
             $(document).on("click", ".blueBox", function ()
             {
-                var a = this.getElementsByClassName("leftText").value;
+                var a = this.getElementsByClassName("leftText")[0];
+               // alert(a);
                 for (var x in array2)
                 {
-                    if (a == array2[x])
+                   // alert(array2[x]);
+
+                    if (a.innerHTML == array2[x])
                     {
                         window.localStorage.setItem('courseID', array1[x]);
                         break;

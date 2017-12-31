@@ -17,55 +17,35 @@
     <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
     <script>
         $(document).ready(function () {
+            var token = window.localStorage.getItem("jwt");
             $.ajax({
                 type: "GET",
-                url: "/api/class/23",
+                url: "/api/class/" + window.localStorage.getItem("classID"),
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
-                success: function (result) {
-                    $("#className").text(result.Data.name);
-                    $("#numStudent").text("学生总数：" + result.Data.numStudent);
-                }
-            })
-            $.ajax({
-                type: "GET",
-                url: "/api/seminar/52/class/32/attendance",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $("#numPresent").append("已签到学生：" + result.Data.numPresent + "/" + result.Data.numStudent);
+                success: function (result)
+                {
+                    $("#className").text(result.name);
+                    $("#numStudent").text("学生总数：" + result.numStudent);
+                    $("#numPresent").append("已签到学生：" + result.numPresent + "/" + result.numStudent);
+                },
+                error: function (data) {
+                    alert(data.responseText);
+
                 }
             })
         });
         //开始签到
-        $(document).on("click", ".blueBigBtn", function () {
-            $.ajax({
-                type: "PUT",
-                url: "/api/class/23",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    window.alert('成功');
-                    $(window).attr("location", "/Teacher/FixedRollCallUI");
-                }
-            })
+        $(document).on("click", ".blueBigBtn", function ()
+        {
+            $(window).attr("location", "/Teacher/FixedRollCallUI"); 
         });
         //查看分组
         $(document).on("click", ".greenBigBtn", function () {
-            $.ajax({
-                type: "GET",
-                url: "/api/class/23",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $(window).attr("location","/Teacher/FixedGroupInfoUI");
-                }
-            })
-        })
+            $(window).attr("location", "/Teacher/FixedGroupInfoUI");
+        });
     </script>
 </head>
 

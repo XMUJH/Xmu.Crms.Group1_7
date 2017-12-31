@@ -23,19 +23,21 @@ namespace Xmu.Crms.Group1_7
         private CrmsContext _db;
         IClassService _classService;
         ISeminarGroupService _seminarGroupService;
+        IUserService _userService;
 
-        public ClassController(CrmsContext db, IClassService classService, ISeminarGroupService seminarGroupService)
+        public ClassController(CrmsContext db, IClassService classService, ISeminarGroupService seminarGroupService, IUserService userService)
         {
             _db = db;
             _classService = classService;
             _seminarGroupService = seminarGroupService;
+            _userService = userService;
         }
 
         [Produces("application/json")]
         //获取与当前用户相关的或者符合条件的班级列表
         //GET:/class
         [HttpGet("api/class")]
-        public IActionResult GetClass(int courseId)
+        public IActionResult GetClass(long courseId)
         {
             try
             {
@@ -72,18 +74,21 @@ namespace Xmu.Crms.Group1_7
         //按ID获取班级详情
         //GET: /class/{classId}
         [HttpGet("api/class/{classId}")]
-        public IActionResult GetClassByClassId(int classId)
+        public IActionResult GetClassByClassId(long classId)
         {
             try
             {
-                var classes = _classService.GetClassByClassId(classId);
+                ClassInfo classInfo = _classService.GetClassByClassId(classId);
+                IList<UserInfo> students = _userService.ListUserByClassId(classInfo.Id, "", "");
                 return Json(new
                 {
-                    id = classes.Id,
-                    name = classes.Name,
-                    time = classes.ClassTime,
-                    site = classes.Site,
-                    proportions = classes.PresentationPercentage
+                    id = classInfo.Id,
+                    name = classInfo.Name,
+                    time = classInfo.ClassTime,
+                    site = classInfo.Site,
+                    proportions = classInfo.PresentationPercentage,
+                    numStudent = students.Count,
+                    numPresent = classInfo.Attendances.Count
                 });
             }
             catch (ClassNotFoundException e)

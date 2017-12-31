@@ -35,6 +35,8 @@
 
                 }
             });
+            var array1 = new Array();
+            var array2 = new Array();
             $.ajax({
                 type: 'GET',
                 url: "/api/course",
@@ -46,7 +48,9 @@
                 {
                     $.each(data, function (i, value)
                     {
-                         $("#blueboxes").append('<div class=\"blueBox\">' + '<p id=\"ptr\" class=\"leftText\">' + value.courseName + '</p>' + '<p class=\"rightText\">' + '老师：' + value.courseTeacher + '</p>' + '</div >');
+                        array1.push(value.id);
+                        array2.push(value.name);
+                        $("#blueboxes").append('<div class=\"blueBox\">' + '<p id=\"ptr\" class=\"leftText\">' + value.name + '</p>' + '<p class=\"rightText\">' + '老师：' + value.teacher.name + '</p>' + '</div >');
                      });
                 },
                 error: function (data)
@@ -60,6 +64,16 @@
             })
             $(document).on("click", ".blueBox", function ()
             {
+                var a = this.getElementsByClassName(".leftText").text();
+                for (var x in array2)
+                {
+                    if (a == array2[x])
+                    {
+                        window.localStorage.setItem('courseID', array1[x]);
+                        break;
+                    }
+
+                }
                 $(window).attr("location", '/CourseUI/CourseUI');
             });
         });

@@ -239,22 +239,12 @@ namespace Xmu.Crms.Group1_7
         //按课程ID获取讨论课详情列表
         //GET: /course/{courseId}/seminar
         [HttpGet("api/course/{courseId}/seminar")]
-        public IActionResult GetSeminar(int courseId)
+        public IActionResult GetSeminar(long courseId)
         {
             try
             {
                 var seminar = _seminarService.ListSeminarByCourseId(courseId);
-                return Json(seminar.Select(c => new {
-                    id = c.Id,
-                    name = c.Name,
-
-                    groupingMethod = c.IsFixed,
-                    starttime = c.StartTime,
-                    endtime = c.EndTime,
-
-                    courseName = c.Course.Name,
-                    description = c.Description
-                }));
+                return Json(seminar);
             }
             catch (CourseNotFoundException)
             {

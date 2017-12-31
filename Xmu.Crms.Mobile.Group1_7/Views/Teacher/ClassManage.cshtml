@@ -27,14 +27,17 @@
     
     <script>
         $(document).ready(function () {
+            var token = window.localStorage.getItem("jwt");
             $.ajax({
                 type: 'GET',
-                url: "/api/course/29/seminar/current",
+                url: "/api/course/" + window.localStorage.getItem("courseID") + "/seminar/current",
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
-                success: function (result) {
-                    $("#courseName").text(result.Data.courseName);
+                success: function (result)
+                {
+                    $("#courseName").text(result.courseName);
                     $("#seminarName").text(result.Data.name);
                     $("#Period").text(result.Data.startTime + "—" + result.Data.endTime);
                     if (result.Data.groupingMethod == "fixed")
@@ -50,7 +53,8 @@
                 }
             })
         });
-        $(document).on("click",".class",function () {
+        $(document).on("click", ".class", function ()
+        {
             $.ajax({
                 type: 'GET',
                 url: "/api/course/23/seminar/current",

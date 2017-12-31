@@ -230,7 +230,7 @@ namespace Xmu.Crms.Services.HotPot
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.ClassNotFoundExceptin">无此ID的班级</exception>
         public ClassInfo GetClassByClassId(long classId)//测试成功
         {
-            var classInfo = _db.ClassInfo.SingleOrDefault(c => c.Id == classId);
+            var classInfo = _db.ClassInfo.Include(c => c.Attendances).Include(c => c.CourseSelections).SingleOrDefault(c => c.Id == classId);
             if (classInfo == null)
                 throw new ClassNotFoundException();
             return classInfo;

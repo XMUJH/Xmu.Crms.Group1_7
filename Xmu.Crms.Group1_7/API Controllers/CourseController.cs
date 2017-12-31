@@ -312,10 +312,11 @@ namespace Xmu.Crms.Group1_7
                 if (currentSeminar.IsFixed != true) groupingMethod = "random";
                 var result = new
                 {
+                    id = currentSeminar.Id,
                     courseName = currentSeminar.Course.Name,
                     name = currentSeminar.Name,
-                    startTime = currentSeminar.StartTime,
-                    endTime = currentSeminar.EndTime,
+                    startTime = currentSeminar.StartTime.ToString("M"),
+                    endTime = currentSeminar.EndTime.ToString("M"),
                     groupingMethod,
                     classes
                 };

@@ -39,6 +39,7 @@
                 dataType: "json",
                 success: function (result)
                 {
+                    window.localStorage.setItem('seminarID', result.id);
                     $("#courseName").text(result.courseName);
                     $("#seminarName").text(result.name);
                     $("#Period").text(result.startTime + "—" + result.endTime);

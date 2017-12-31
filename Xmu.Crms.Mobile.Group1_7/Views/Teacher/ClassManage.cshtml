@@ -26,10 +26,10 @@
     <link rel="stylesheet" href="~/css/ClassManage.css" type="text/css">
     
     <script>
+        var array1 = new Array();
+        var array2 = new Array();
         $(document).ready(function () {
             var token = window.localStorage.getItem("jwt");
-            var array1 = new Array();
-            var array2 = new Array();
             $.ajax({
                 type: 'GET',
                 url: "/api/course/" + window.localStorage.getItem("courseID") + "/seminar/current",
@@ -43,9 +43,15 @@
                     $("#seminarName").text(result.name);
                     $("#Period").text(result.startTime + "—" + result.endTime);
                     if (result.groupingMethod == "fixed")
+                    {
+                        window.localStorage.setItem('groupingMethod', "fixed");
                         $("#groupingMethod").text("固定分组");
+                    }
                     else
+                    {
+                        window.localStorage.setItem('groupingMethod', "random");
                         $("#groupingMethod").text("随机分组");
+                    }
                     
                     $.each(result.classes, function (i, value)
                     {
@@ -54,23 +60,24 @@
                         var imgObj = "<img src=\"\\images\\themes\\ClassManage.png\" class=\"classIcon\">";
                         $("#classes").append('<div class=\"class\" id=\"class\">' + imgObj + '<p class=\"className\">' + value.name+ '</p ></div > ');
                     });
+                },
+                 error: function (data) {
+                    alert(data.responseText);
+
                 }
             })
-        });
-        $(document).on("click", ".class", function ()
-        {
-            var a = this.getElementsByClassName("className")[0].innerHTML;
-            for (var x in array2)
-            {
-                if (a == array2[x])
-                {
-                    window.localStorage.setItem('classID', array1[x]);
-                    break;
+            $(document).on("click", ".class", function () {
+                var a = this.getElementsByClassName("className")[0].innerHTML;
+                for (var x in array2) {
+                    if (a == array2[x]) {
+                        window.localStorage.setItem('classID', array1[x]);
+                        break;
+                    }
                 }
-            }
-            if (result.groupingMethod == "fixed") $(window).attr("location", '/Teacher/FixedRollStartCallUI');
-            else $(window).attr("location", '/Teacher/RandomRollStartCallUI');
-        })
+                if (window.localStorage.getItem("groupingMethod") == "fixed") $(window).attr("location", '/Teacher/FixedRollStartCallUI');
+                else $(window).attr("location", '/Teacher/RandomRollStartCallUI');
+            })
+        });
     </script>
 </head>
 <body class="body">

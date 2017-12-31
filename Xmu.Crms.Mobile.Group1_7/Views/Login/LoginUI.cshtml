@@ -27,36 +27,20 @@
                     dataType: "json",
                     success: function (data)
                     {
-                        if (data.type == "teacher")
+                        alert('登录成功');
+                        if (!window.localStorage)
                         {
-                            alert('登录成功');
-                            if (!window.localStorage)
-                            {
-                                alert("浏览器支持localstorage");
-                            }
-                            else
-                            {
-                                window.localStorage.setItem('jwt', data.jwt);
-                                window.localStorage.setItem('id', data.id);
-                                window.localStorage.setItem('type', data.type);
-                            }
-                            $(window).attr("location", '/Login/TeacherMainUI');
-                            }
+                            alert("浏览器支持localstorage");
+                        }
                         else
                         {
-                            alert('登录成功');
-                            if (!window.localStorage)
-                            {
-                                alert("浏览器支持localstorage");
-                            }
-                            else
-                            {
-                                window.localStorage.setItem('jwt', data.jwt);
-                                window.localStorage.setItem('id', data.id);
-                                window.localStorage.setItem('type', data.type);
-                            }
-                            $(window).attr("location", '/Login/StudentMainUI');
+                            window.localStorage.setItem('jwt', data.jwt);
+                            window.localStorage.setItem('id', data.id);
+                            window.localStorage.setItem('type', data.type);
                         }
+                        if (window.localStorage.getItem("type")=="Teacher") $(window).attr("location", '/Login/TeacherMainUI');
+                        else $(window).attr("location", '/Login/StudentMainUI');
+                      
                     },
                     error: function (data)
                     {

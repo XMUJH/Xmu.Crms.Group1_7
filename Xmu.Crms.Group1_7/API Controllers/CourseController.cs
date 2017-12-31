@@ -43,7 +43,7 @@ namespace Xmu.Crms.Group1_7
         {
             try
             {
-                var courses = _courseService.ListCourseByUserId(User.Id())
+                var courses = _courseService.ListCourseByUserId(User.Id());
                 return Json(courses);
             }
             catch (CourseNotFoundException e)

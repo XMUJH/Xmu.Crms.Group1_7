@@ -57,7 +57,7 @@
             });
             $(document).on("click", ".blueBox", function ()
             {
-                var a = this.getElementsByClassName(".text").text();
+                var a = this.getElementsByClassName(".text").value;
                 for (var x in array2) {
                     if (a == array2[x]) {
                         window.localStorage.setItem('courseID', array1[x]);

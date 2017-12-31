@@ -212,7 +212,7 @@ namespace Xmu.Crms.Services.Group1_7
             //用户为老师
             if (user.Type == Shared.Models.Type.Teacher)
             {
-                courses = _db.Course.Where(c => c.Teacher.Id == userId).ToList();
+                courses = _db.Course.Include(c => c.Teacher).Where(c => c.Teacher.Id == userId).ToList();
                 if (courses == null)
                     throw new CourseNotFoundException();
 
@@ -221,14 +221,14 @@ namespace Xmu.Crms.Services.Group1_7
             else if (user.Type == Shared.Models.Type.Student)
             {
                 //通过学生找到班级列表
-                IList<CourseSelection> selections = _db.CourseSelection.Where(c => c.Student.Id == userId).ToList();
+                IList<CourseSelection> selections = _db.CourseSelection.Include(c => c.Student).Include(c => c.ClassInfo).Where(c => c.Student.Id == userId).ToList();
                 IList<ClassInfo> classes = new List<ClassInfo>();
                 foreach (CourseSelection selection in selections)
-                    classes.Add(selection.ClassInfo);
+                    classes.Add(_db.ClassInfo.Include(c => c.Course).SingleOrDefault(c => c.Id == selection.ClassId));
 
                 //通过班级列表找到课程列表
                 foreach (ClassInfo info in classes)
-                    courses.Add(info.Course);
+                    courses.Add(_db.Course.Include(c => c.Teacher).SingleOrDefault( c => c.Id == info.CourseId));
             }
 
             else

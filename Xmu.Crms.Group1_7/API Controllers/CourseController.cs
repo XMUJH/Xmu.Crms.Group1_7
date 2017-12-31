@@ -44,15 +44,7 @@ namespace Xmu.Crms.Group1_7
             try
             {
                 var courses = _courseService.ListCourseByUserId(User.Id());
-                return Json(courses.Select(c => new
-                {
-                    id = c.Id,
-                    name = c.Name,
-                    numClass = _classService.ListClassByCourseId(c.Id).Count,
-                    numStudent = _classService.ListClassByCourseId(c.Id).Aggregate(0, (total, cls) => _db.Entry(cls).Collection(cl => cl.CourseSelections).Query().Count() + total),
-                    startTime = c.StartDate.ToString("yyyy-MM-dd"),
-                    endTime = c.EndDate.ToString("yyyy-MM-dd"),
-                }));
+                return Json(courses);
             }
             catch (CourseNotFoundException e)
             {

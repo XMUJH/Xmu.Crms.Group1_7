@@ -26,14 +26,16 @@ namespace Xmu.Crms.Group1_7
         IClassService _classService;
         ISeminarService _seminarService;
         IGradeService _gradeService;
+        ISeminarGroupService _seminarGroupService;
         private readonly JwtHeader _header;
-        public CourseController(CrmsContext db, ICourseService courseService, IClassService classService, ISeminarService seminarService, IGradeService gradeService, JwtHeader header)
+        public CourseController(CrmsContext db, ICourseService courseService, IClassService classService, ISeminarService seminarService, IGradeService gradeService,ISeminarGroupService seminarGroupService, JwtHeader header)
         {
             _db = db;
             _courseService = courseService;
             _classService = classService;
             _seminarService = seminarService;
             _gradeService = gradeService;
+            _seminarGroupService = seminarGroupService;
             _header = header;
         }
         //获取与当前用户相关联的课程列表
@@ -107,7 +109,7 @@ namespace Xmu.Crms.Group1_7
                     startdate = courses.StartDate,
                     enddate = courses.EndDate,
 
-                    teacherName = courses.Teacher.Name,
+                    teacher = courses.Teacher,
                     description = courses.Description
                 } );
             }
@@ -243,8 +245,19 @@ namespace Xmu.Crms.Group1_7
         {
             try
             {
-                var seminar = _seminarService.ListSeminarByCourseId(courseId);
-                return Json(seminar);
+                DateTime dt = DateTime.Now;
+                var seminars = _seminarService.ListSeminarByCourseId(courseId);
+                return Json(seminars.Select(s => new
+                {
+                    id = s.Id,
+                    name = s.Name,
+                    description = s.Description,
+                    groupingMethod = (s.IsFixed == true) ? "fixed" : "random",
+                    startTime = s.StartTime.ToString("M"),
+                    endTime = s.EndTime.ToString("M"),
+                    Judge = ((DateTime.Compare(dt, s.StartTime) > 0) && (DateTime.Compare(s.EndTime, dt) > 0)) ? 1 : 0,
+                    grade = (_seminarGroupService.GetSeminarGroupById(s.Id, User.Id()).FinalGrade > 0) ? _seminarGroupService.GetSeminarGroupById(s.Id, User.Id()).FinalGrade : 0
+                }));
             }
             catch (CourseNotFoundException)
             {

@@ -430,7 +430,7 @@ namespace Xmu.Crms.Services.Group2_10
 
             //找出Seminar里的所有小组
             SeminarGroups = _db.SeminarGroup.Include(x => x.Seminar)
-                .Where(x => x.Seminar == seminar).ToList();
+                .Where(x => x.SeminarId == seminar.Id).ToList();
 
             //在这些小组中，找到成员含有该user的小组
             foreach (SeminarGroup TempGroup in SeminarGroups)

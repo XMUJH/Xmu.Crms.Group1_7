@@ -19,31 +19,54 @@
     <script>
         $(document).ready(function ()
         {
+            var token = window.localStorage.getItem("jwt");
+            var array = new Array();
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/course/13/seminar",
+                    url: "/api/course/" + window.localStorage.getItem("courseID") +"/seminar",
                     data:"",
                     contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result)
                     {
-                        $.each(result.Data, function (i, value)
+                        var timestamp = Date.parse(new Date());
+                        $.each(result, function (i, value)
                         {
-                            if (i == 0) $("#seminars").append('<div class="blueBox">' + '<p class="LeftBoxText">' + "讨论课" + (i + 1) + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "至" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:未完成" + '</p>' + '</div>');
-                            if (i == 1) $("#seminars").append('<div class="greyBox">' + '<p class="LeftBoxText">' + "讨论课" + (i + 1) + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "至" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:已完成" + '</p>' + '</div>');
+                            if (value.judge == 1)
+                            {
+                                array.push(value);
+                                $("#seminars").append('<div class="blueBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "-" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:" + value.grade + '</p>' + '</div>');
+                            }
+                                
+                            //$("#seminars").append('<div class="greyBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "至" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:已完成" + '</p>' + '</div>');
+                        });
+                        $.each(result, function (i, value) {
+                            if (value.judge == 0)
+                                $("#seminars").append('<div class="greyBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "-" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:" + value.grade +  '</p>' + '</div>');
                         });
                     }
                 })
+            $(document).on("click", ".ninedotImg", function () {
+                    $(window).attr("location", '/CourseInfoUI/CourseInfoUI');
+                })
+            $(document).on("click", ".blueBox", function () {
+                var a = this.getElementsByClassName("LeftBoxText")[0];
+                // alert(a);
+                for (var x in array) {
+                    // alert(array2[x]);
+
+                    if (a.innerHTML == array[x].name) {
+                        window.localStorage.setItem('seminarID', array[x].id);
+                        break;
+                    }
+
+                }
+                $(window).attr("location", '/SeminarUI/Seminar');
+            })
         })
-        $(document).on("click", ".ninedotImg", function ()
-        {
-            $(window).attr("location", '/CourseInfoUI/CourseInfoUI');
-        })
-        $(document).on("click", ".blueBox", function ()
-        {
-            $(window).attr("location", '/SeminarUI/Seminar');
-        })
+    
     </script>
 </head>
 <body class="body">

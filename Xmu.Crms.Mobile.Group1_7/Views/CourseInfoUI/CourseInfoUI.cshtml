@@ -19,37 +19,39 @@
     <script>
         $(document).ready(function ()
         {
+            var token = window.localStorage.getItem("jwt");
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/course/13",
+                    url: "/api/course/" + window.localStorage.getItem("courseID"),
                     data: "",
                     contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result)
                     {
-                        $("#teacherName").text("老师: " + result.Data.teacherName);
-                        $("#teacherMail").text("邮箱: " + result.Data.teacherMail);
-                        $.ajax(
-                            {
-                                type: 'GET',
-                                url: "/api/course/13/class",
-                                data: "",
-                                contentType: "application/json; charset=utf-8",
-                                dataType: "json",
-                                success: function (result)
-                                {
-                                    $.each(result.Data, function (i, value)
-                                    {
-                                        if (i == 0)
-                                        {
-                                            $("#defaultValue").text(value.name);
-                                        }
-                                        $("#lis").append('<li>' + '<a href="#">' + value.name + '</a>' + '</li>');
-                                    });
-                                }
-                            })
+                        $("#teacherName").text("老师: " + result.teacher.name);
+                        $("#teacherMail").text("邮箱: " + result.teacher.email);
+                        
+                        $("#teacherDes").text("简介: " + result.description);
                     }
+                })
+            $.ajax(
+                {
+                     type: 'GET',
+                     url: "/api/course/" + window.localStorage.getItem("courseID") + "/class",
+                     data: "",
+                     contentType: "application/json; charset=utf-8",
+                     headers: { "Authorization": "Bearer " + token },
+                     dataType: "json",
+                     success: function (result) {
+                         $.each(result.Data, function (i, value) {
+                             if (i == 0) {
+                                $("#defaultValue").text(value.name);
+                             }
+                              $("#lis").append('<li>' + '<a href="#">' + value.name + '</a>' + '</li>');
+                            });
+                        }
                 })
         })
     </script>
@@ -64,7 +66,7 @@
     </div>
     <div>
         <img class="MailImg" src="~/images/CourseInfo/MailIcon.png" />
-        <p class="MailText" id="teacherMail">邮箱：qiuming@gmail.com</p>
+        <p class="MailText" id="teacherMail"></p>
     </div>
     <div>
         <img src="~/images/CourseInfo/HouseIcon.png" class="HouseImg" />
@@ -89,7 +91,7 @@
     </div>
     <div>
         <img src="~/images/CourseInfo/FileIcon.png" class="PaperImg" />
-        <p class="IntroText">简介</p>
+        <p class="IntroText" id="teacherDes">简介</p>
     </div>
 </body>
 </html>

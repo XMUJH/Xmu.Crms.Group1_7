@@ -212,7 +212,7 @@ namespace Xmu.Crms.Services.Group1_7
             //用户为老师
             if (user.Type == Shared.Models.Type.Teacher)
             {
-                courses = _db.Course.Where(c => c.Teacher.Id == userId).ToList();
+                courses = _db.Course.Include(c => c.Teacher).Where(c => c.Teacher.Id == userId).ToList();
                 if (courses == null)
                     throw new CourseNotFoundException();
 

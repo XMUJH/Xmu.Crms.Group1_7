@@ -288,41 +288,59 @@ namespace Xmu.Crms.Group1_7
         //获取课程正在进行的讨论课
         ///???对应service未找到没有找到接口
         //GET: /course/{courseId}/seminar/current
-        //[HttpGet("api/course/{courseId}/seminar/current")]
-        //public IActionResult GetSeminar(int courseId)
-        //{
-        //    try
-        //    {
-        //        var seminar = _seminarService.ListSeminarByCourseId(courseId);
-        //        return Json(seminar.Select(c => new {
-        //            id = c.Id,
-        //            name = c.Name,
-
-        //            groupingMethod = c.IsFixed,
-        //            starttime = c.StartTime,
-        //            endtime = c.EndTime,
-
-        //            courseName = c.Course.Name,
-        //            description = c.Description
-        //        }));
-        //    }
-        //    catch (CourseNotFoundException)
-        //    {
-        //        return StatusCode(404, new { msg = "未找到课程" });
-        //    }
-        //    catch (ArgumentException)
-        //    {
-        //        return StatusCode(400, new { msg = "错误的ID格式" });
-        //    }
-        //    //var result = new JsonResult();
-        //    //var classes = new object[] {
-        //    //    new { id = 53, name = "周三12" },
-        //    //    new { id = 57, name = "周三34" }
-        //    //};
-        //    //var data = new { id = 29, name = "界面原型设计", courseName = "OOAD", groupingMethod = "fixed", startTime = "2017-09-25", endTime = "2017-10-09", classes };
-        //    //result.Data = data;
-        //    //return result;
-        //}
+        [HttpGet("api/course/{courseId}/seminar/current")]
+        public IActionResult GetCurrentSeminar(long courseId)
+        {
+            try
+            {
+                IList<Seminar> seminars = _seminarService.ListSeminarByCourseId(courseId);
+                DateTime dt = DateTime.Now;
+                Seminar currentSeminar = new Seminar();
+                bool flag = false;
+                foreach (Seminar seminar in seminars)
+                {
+                    if((DateTime.Compare(dt, seminar.StartTime) > 0)&&(DateTime.Compare(seminar.EndTime,dt)>0))
+                    {
+                        currentSeminar = seminar;
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag == false) throw new SeminarNotFoundException("没有正在进行的讨论课");
+                IList<ClassInfo> classes = _classService.ListClassByCourseId(courseId);
+                var groupingMethod = "fixed";
+                if (currentSeminar.IsFixed != true) groupingMethod = "random";
+                var result = new
+                {
+                    courseName = currentSeminar.Course.Name,
+                    name = currentSeminar.Name,
+                    startTime = currentSeminar.StartTime,
+                    endTime = currentSeminar.EndTime,
+                    groupingMethod,
+                    classes
+                };
+                return Json(result);
+            }
+            catch (CourseNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400, "错误的ID格式");
+            }
+            //var result = new JsonResult();
+            //var data = new object[] {
+            //    new { id = 29, name = "界面原型设计", description = "界面原型设计", groupingMethod = "fixed", startTime = "2017-09-25", endTime = "2017-10-09", grade=4},
+            //    new { id = 32, name = "概要设计", description = "模型层与数据库设计", groupingMethod = "fixed", startTime = "2017-10-10", endTime = "2017-10-24", grade=5}
+            //};
+            //result.Data = data;
+            //return result;
+        }
 
         //按课程ID获取学生的所有讨论课成绩
         //GET: /course/{courseId}/grade

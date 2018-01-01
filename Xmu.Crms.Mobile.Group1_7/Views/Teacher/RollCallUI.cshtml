@@ -19,6 +19,16 @@
         var token = window.localStorage.getItem("jwt");
         $(document).ready(function ()
         {
+            if (window.localStorage.getItem("groupingMethod") == "fixed")
+            {
+                with (document.getElementById("see1").style) { (display = "") };
+                with (document.getElementById("see2").style) { (display = "none") };
+            }
+            else
+            {
+                with (document.getElementById("see1").style) { (display = "none") };
+                with (document.getElementById("see2").style) { (display = "") };
+            }
             $.ajax({
                 type: "GET",
                 url: "/api/class/" + window.localStorage.getItem("classID"),
@@ -59,7 +69,39 @@
         //结束签到Button
         $(document).on("click", ".redBigBtn", function ()
         {
-            $(window).attr("location", "/Teacher/EndRollCallUI");  
+            $.ajax({
+                type: "PUT",
+                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/endCall",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (result)
+                {
+                    $.ajax({
+                        type: "PUT",
+                        url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/finishAttendanceList",
+                        data: "",
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (result2)
+                        {
+                            $(window).attr("location", "/Teacher/EndRollCallUI");
+                        },
+                        error: function (data2)
+                        {
+                            alert(data2.responseText);
+
+                        }
+                    })
+                },
+                error: function (data)
+                {
+                    alert(data.responseText);
+
+                }
+            })  
         });
         //查看分组Button
         $(document).on("click", ".greenBigBtn", function ()
@@ -101,7 +143,8 @@
     </div>
 
     <div>
-        <button type="button" class="greenBigBtn" id="check">查看分组</button>
+        <button type="button" class="greenBigBtn" id="see1">查看分组</button>
+        <button type="button" class="greyBigBtn" id="see2">查看分组</button>
     </div>
 
 </body>

@@ -267,7 +267,7 @@ namespace Xmu.Crms.Group1_7
             }
         }
 
-        [HttpPost("api/seminar/{seminarId}/class/{classId}/endCall")]
+        [HttpPut("api/seminar/{seminarId}/class/{classId}/endCall")]
         public IActionResult EndCallInRoll(long seminarId, long classId)
         {
             if (User.Type() != Type.Teacher)
@@ -294,6 +294,66 @@ namespace Xmu.Crms.Group1_7
             }
         }
 
+        [HttpPut("api/seminar/{seminarId}/class/{classId}/finishAttendanceList")]
+        public IActionResult FinishList(long seminarId, long classId)
+        {
+            if (User.Type() != Type.Teacher)
+            {
+                return StatusCode(403, "权限不足");
+            }
+            try
+            {
+                IList<UserInfo> users1 = _userService.ListPresentStudent(seminarId, classId);
+                IList<UserInfo> users2 = _userService.ListLateStudent(seminarId, classId);
+                IList<UserInfo> users3 = new List<UserInfo>();
+                IList<long> usersId2 = new List<long>();
+                foreach(UserInfo x in users1)
+                {
+                    users3.Add(x);
+                }
+                foreach (UserInfo x in users2)
+                {
+                    users3.Add(x);
+                }
+                foreach(UserInfo x in users3)
+                {
+                    usersId2.Add(x.Id);
+                }
+                IList<UserInfo> users = _userService.ListUserByClassId(classId, "", "");
+                IList<long> usersId = new List<long>();
+                foreach (UserInfo x in users)
+                {
+                    usersId.Add(x.Id);
+                }
+                Attendance tool = new Attendance();
+                foreach(long x in usersId)
+                {
+                    if(usersId2.Contains(x)==false)
+                    {
+                        tool.ClassId = classId;
+                        tool.SeminarId = seminarId;
+                        tool.StudentId = x;
+                        tool.AttendanceStatus = AttendanceStatus.Absent;
+                        _db.Attendences.Add(tool);
+                    }
+                }
+                _db.SaveChanges();
+                return NoContent();
+            }
+            catch (ClassNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(404, "错误的ID格式");
+            }
+        }
+
         [HttpGet("api/seminar/{seminarId}/class/{classId}/attendance/present")]
         public IActionResult GetPresentStudent(long seminarId, long classId)
         {
@@ -303,26 +363,77 @@ namespace Xmu.Crms.Group1_7
             }
             try
             {
-                ClassInfo classInfo = _classService.GetClassByClassId(classId);
-                IList<Attendance> attendances2 = new List<Attendance>();
-                foreach(Attendance tag in classInfo.Attendances)
-                {
-                    if(tag.SeminarId==seminarId)
-                    {
-                        attendances2.Add(tag);
-                    }
-                }
-                IList<UserInfo> attendances = new List<UserInfo>();
-                foreach (Attendance tag in attendances2)
-                {
-                    attendances.Add(_userService.GetUserByUserId(tag.StudentId));
-                }
+                IList<UserInfo> attendances = _userService.ListPresentStudent(seminarId, classId);
                 var result = new
                 {
                     numPresent = attendances.Count(),
                     attendances
                 };
                 return Json(result);
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ClassNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(404, "错误的ID格式");
+            }
+        }
+
+        [HttpGet("api/seminar/{seminarId}/class/{classId}/attendance/late")]
+        public IActionResult GetLateStudent(long seminarId, long classId)
+        {
+            if (User.Type() != Type.Teacher)
+            {
+                return StatusCode(403, "权限不足");
+            }
+            try
+            {
+                IList<UserInfo> attendances = _userService.ListLateStudent(seminarId, classId);
+                var result = new
+                {
+                    attendances
+                };
+                return Json(result);
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ClassNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(404, "错误的ID格式");
+            }
+        }
+
+        [HttpGet("api/seminar/{seminarId}/class/{classId}/attendance/absent")]
+        public IActionResult GetAbsentStudent(long seminarId, long classId)
+        {
+            if (User.Type() != Type.Teacher)
+            {
+                return StatusCode(403, "权限不足");
+            }
+            try
+            {
+                IList<UserInfo> attendances = _userService.ListAbsenceStudent(seminarId, classId);
+                var result = new
+                {
+                    attendances
+                };
+                return Json(result);
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
             }
             catch (ClassNotFoundException e)
             {

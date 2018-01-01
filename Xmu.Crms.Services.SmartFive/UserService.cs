@@ -231,10 +231,10 @@ namespace Xmu.Crms.Services.SmartFive
         {
             var user = (from class1 in _db.CourseSelection
                         from c in _db.UserInfo
-                        where class1.ClassInfo.Id == classId && class1.Student.Id == c.Id && c.Name.ToString().StartsWith(nameBeginWith) && c.Number.ToString().StartsWith(numBeginWith)
+                        where class1.ClassId == classId && class1.StudentId == c.Id && c.Name.ToString().StartsWith(nameBeginWith) && c.Number.ToString().StartsWith(numBeginWith)
                         select new UserInfo
                         {
-                            Id = class1.Student.Id,
+                            Id = class1.StudentId,
                             Phone = class1.Student.Phone,
                             Avatar = class1.Student.Avatar,
                             Password = class1.Student.Password,

@@ -19,6 +19,16 @@
     <script>
         var token = window.localStorage.getItem("jwt");
         $(document).ready(function () {
+            if (window.localStorage.getItem("groupingMethod") == "fixed") 
+            {
+                with (document.getElementById("see1").style) { (display = "") };
+                with (document.getElementById("see2").style) { (display = "none") };
+            }
+            else
+            {
+                with (document.getElementById("see1").style) { (display = "none") };
+                with (document.getElementById("see2").style) { (display = "") };
+            }
             $.ajax({
                 type: "GET",
                 url: "/api/class/" + window.localStorage.getItem("classID"),
@@ -88,7 +98,8 @@
             });
         });
         //查看分组
-        $(document).on("click", ".greenBigBtn", function () {
+        $(document).on("click", ".greenBigBtn", function ()
+        {
             $(window).attr("location", "/Teacher/FixedGroupInfoUI");
         });
     </script>
@@ -128,7 +139,8 @@
     </div>
 
     <div>
-        <button type="button" class="greenBigBtn">查看分组</button>
+        <button type="button" class="greenBigBtn" id="see1">查看分组</button>
+        <button type="button" class="greyBigBtn" id="see2">查看分组</button>
     </div>
 
 </body>

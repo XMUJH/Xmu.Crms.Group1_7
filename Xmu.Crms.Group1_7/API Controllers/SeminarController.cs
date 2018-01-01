@@ -8,6 +8,12 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Xmu.Crms.Shared.Exceptions;
 using Type = Xmu.Crms.Shared.Models.Type;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using static Xmu.Crms.Group1_7.Utils;
 
 namespace Xmu.Crms.Group1_7
 {
@@ -257,6 +263,46 @@ namespace Xmu.Crms.Group1_7
                 return StatusCode(404, e.GetAlertInfo());
             }
             catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(404, "错误的ID格式");
+            }
+        }
+
+        [HttpGet("api/seminar/{seminarId}/class/{classId}/attendance/present")]
+        public IActionResult GetPresentStudent(long seminarId, long classId)
+        {
+            if (User.Type() != Type.Teacher)
+            {
+                return StatusCode(403, "权限不足");
+            }
+            try
+            {
+                ClassInfo classInfo = _classService.GetClassByClassId(classId);
+                IList<Attendance> attendances2 = new List<Attendance>();
+                foreach(Attendance tag in classInfo.Attendances)
+                {
+                    if(tag.SeminarId==seminarId)
+                    {
+                        attendances2.Add(tag);
+                    }
+                }
+                IList<UserInfo> attendances = new List<UserInfo>();
+                foreach (Attendance tag in attendances2)
+                {
+                    attendances.Add(_userService.GetUserByUserId(tag.StudentId));
+                }
+                var result = new
+                {
+                    numPresent = attendances.Count(),
+                    attendances
+                };
+                return Json(result);
+            }
+            catch (ClassNotFoundException e)
             {
                 return StatusCode(404, e.GetAlertInfo());
             }

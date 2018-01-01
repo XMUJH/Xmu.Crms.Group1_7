@@ -29,7 +29,21 @@
                 success: function (result) {
                     $("#className").text(result.name);
                     $("#numStudent").text("学生总数：" + result.numStudent);
-                    $("#numPresent").append("已签到学生：" + result.numPresent + "/" + result.numStudent);
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/present",
+                        data: "",
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (result2) {
+                            $("#numPresent").append("已签到学生：" + result2.numPresent + "/" + result.numStudent);
+                        },
+                        error: function (data2) {
+                            alert(data2.responseText);
+
+                        }
+                    })
                 },
                 error: function (data) {
                     alert(data.responseText);

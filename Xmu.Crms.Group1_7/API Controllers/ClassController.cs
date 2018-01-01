@@ -88,7 +88,7 @@ namespace Xmu.Crms.Group1_7
                     site = classInfo.Site,
                     proportions = classInfo.PresentationPercentage,
                     numStudent = students.Count,
-                    numPresent = classInfo.Attendances.Count
+                    //numPresent = classInfo.Attendances.Count
                 });
             }
             catch (ClassNotFoundException e)

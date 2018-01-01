@@ -16,69 +16,41 @@
     <link rel="stylesheet" href="~/css/RollStartCallUI.css">
     <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
     <script>
-        $(document).ready(function () {
+        var token = window.localStorage.getItem("jwt");
+        $(document).ready(function ()
+        {
             $.ajax({
                 type: "GET",
-                url: "/api/class/23",
+                url: "/api/class/" + window.localStorage.getItem("classID"),
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
                 success: function (result) {
-                    $("#className").text(result.Data.name);
-                    $("#numStudent").text("学生总数：" + result.Data.numStudent);
-                }
-            })
-            $.ajax({
-                type: "GET",
-                url: "/api/seminar/52/class/32/attendance",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $("#numPresent").append("已签到学生：" + result.Data.numPresent + "/" + result.Data.numStudent);
+                    $("#className").text(result.name);
+                    $("#numStudent").text("学生总数：" + result.numStudent);
+                    $("#numPresent").append("已签到学生：" + result.numPresent + "/" + result.numStudent);
+                },
+                error: function (data) {
+                    alert(data.responseText);
+
                 }
             })
         });
         //签到名单Button
-        $(document).on("click", ".blueCallBtn", function () {
-            $.ajax({
-                type: "GET",
-                url: "/api/class/23",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    $(window).attr("location", "/Teacher/RollCallListUI");
-                }
-            })
+        $(document).on("click", ".blueCallBtn", function ()
+        {
+            $(window).attr("location", "/Teacher/RollCallListUI"); 
         });
         //结束签到Button
-        $(document).on("click", ".redBigBtn", function () {
-            $.ajax({
-                type: "PUT",
-                url: "/api/class/23",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    alert('成功！');
-                    $(window).attr("location", "/Teacher/FixedEndRollCallUI");
-                }
-            })
+        $(document).on("click", ".redBigBtn", function ()
+        {
+            $(window).attr("location", "/Teacher/FixedEndRollCallUI");  
         });
         //查看分组Button
-        $(document).on("click", ".greenBigBtn", function () {
-            $.ajax({
-                type: "GET",
-                url: "/api/class/23",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $(window).attr("location", "/Teacher/FixedGroupInfoUI");
-                    
-                }
-            })
+        $(document).on("click", ".greenBigBtn", function ()
+        {
+            $(window).attr("location", "/Teacher/FixedGroupInfoUI");   
         });      
     </script>
 </head>

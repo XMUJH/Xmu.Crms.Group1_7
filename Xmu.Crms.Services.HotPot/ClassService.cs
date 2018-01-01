@@ -168,7 +168,7 @@ namespace Xmu.Crms.Services.HotPot
                 throw new ClassNotFoundException();
             if (location.Seminar == null)
                 throw new SeminarNotFoundException();
-
+            location.Status = 1;
             var callinroll = _db.Location.Add(location);
             _db.SaveChanges();
             return callinroll.Entity.Id;

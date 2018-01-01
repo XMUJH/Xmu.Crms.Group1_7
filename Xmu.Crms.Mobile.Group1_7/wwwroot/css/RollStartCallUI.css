@@ -74,7 +74,7 @@ body {
 /*¾ÓÖÐµÄÒÑÇ©µ½Ñ§ÉúµÄÎÄ×ÖºÍÈÝÆ÷*/
 .studentNum {
     height: 3em;
-    width: 100%;
+    width: 92%;
     margin-top: 5%;
     float: left;
     font-size: 3em;
@@ -109,8 +109,8 @@ body {
 /*¾Ó×óÒÑÇ©µ½Ñ§ÉúÇ©ÃûµÄicon*/
 .usersIcon2 {
     width: 15%;
-    height: 100%;
-    margin-left: 13%;
+    height: 70%;
+    margin-left: 5%;
 }
 
 /*Ç©µ½Ãûµ¥button*/

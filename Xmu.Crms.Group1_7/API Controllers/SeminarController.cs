@@ -21,13 +21,15 @@ namespace Xmu.Crms.Group1_7
         private readonly IUserService _userService;
         private readonly CrmsContext _db;
         private readonly ISeminarGroupService _seminargroupService;
+        private readonly IClassService _classService;
 
-        public SeminarController(ISeminarService seminarService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, CrmsContext db)
+        public SeminarController(ISeminarService seminarService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, IClassService classService, CrmsContext db)
         {
             _seminarService = seminarService;
             _topicService = topicService;
             _seminargroupService = seminargroupService;
             _userService = userService;
+            _classService = classService;
             _db = db;
         }
 
@@ -200,6 +202,67 @@ namespace Xmu.Crms.Group1_7
             catch (ArgumentException)
             {
                 return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
+            }
+        }
+
+        [HttpPut("api/seminar/{seminarId}/class/{classId}/startCall")]
+        public IActionResult StartCallInRoll(long seminarId, long classId, [FromBody]dynamic json)
+        {
+            if (User.Type() != Type.Teacher)
+            {
+                return StatusCode(403, "权限不足");
+            }
+
+            try
+            {
+                Location location = new Location();
+                location.SeminarId = seminarId;
+                location.ClassInfoId = classId;
+                location.ClassInfo = _classService.GetClassByClassId(classId);
+                location.Seminar = _seminarService.GetSeminarBySeminarId(seminarId);
+                location.Longitude = json.lng;
+                location.Latitude = json.lat;
+                long result = _classService.CallInRollById(location);
+                return Json(result);
+            }
+            catch(ClassNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch(ArgumentException)
+            {
+                return StatusCode(404, "错误的ID格式");
+            }
+        }
+
+        [HttpPost("api/seminar/{seminarId}/class/{classId}/endCall")]
+        public IActionResult EndCallInRoll(long seminarId, long classId)
+        {
+            if (User.Type() != Type.Teacher)
+            {
+                return StatusCode(403, "权限不足");
+            }
+
+            try
+            {
+                _classService.EndCallRollById(seminarId, classId);
+                return NoContent();
+            }
+            catch (ClassNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(404, "错误的ID格式");
             }
         }
     }

@@ -52,6 +52,7 @@ namespace Xmu.Crms.Services.SmartFive
 
         public long InsertAttendanceById(long classId, long seminarId, long userId, double longitude, double latitude)//测试成功时间
         {
+            var location = _db.Location.Include(c => c.Seminar).Include(c => c.ClassInfo).SingleOrDefault(c => c.ClassInfoId == classId && c.SeminarId == seminarId);
             if (classId <= 0 || seminarId <= 0 || userId <= 0)
             {
                 throw new ArgumentException();
@@ -66,6 +67,11 @@ namespace Xmu.Crms.Services.SmartFive
                      select seminar).SingleOrDefault();
             if (v == null)
                 throw new SeminarNotFoundException();
+            if (longitude - (double)location.Longitude>0.5 || longitude - (double)location.Longitude < -0.5 || latitude - (double)location.Latitude > 0.5 || latitude - (double)location.Latitude < -0.5)
+            {
+                //throw new Shared.Exceptions.InvalidOperationException("超出签到范围");
+                throw new UserNotFoundException("超出签到范围");
+            }
             Attendance attendance = new Attendance();
             IList<Attendance> attendanceList = this.ListAttendanceById(classId, seminarId);
             int cnt = attendanceList.Count;
@@ -78,9 +84,11 @@ namespace Xmu.Crms.Services.SmartFive
             attendance.Seminar = (from k in _db.Seminar
                                   where k.Id == seminarId
                                   select k).SingleOrDefault();
+            attendance.AttendanceStatus = 0;
             _db.Attendences.Add(attendance);
             _db.SaveChanges();
             return attendance.Id;
+            throw new System.InvalidOperationException();
         }
 
         public IList<UserInfo> ListAbsenceStudent(long seminarId, long classId) //测试成功

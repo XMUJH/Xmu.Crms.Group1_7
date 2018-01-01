@@ -25,14 +25,16 @@ namespace Xmu.Crms.Group1_7
         private readonly ISeminarService _seminarService;
         private readonly ITopicService _topicService;
         private readonly IUserService _userService;
+        private readonly ICourseService _courseService;
         private readonly CrmsContext _db;
         private readonly ISeminarGroupService _seminargroupService;
         private readonly IClassService _classService;
 
-        public SeminarController(ISeminarService seminarService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, IClassService classService, CrmsContext db)
+        public SeminarController(ISeminarService seminarService, ICourseService courseService,ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, IClassService classService, CrmsContext db)
         {
             _seminarService = seminarService;
             _topicService = topicService;
+            _courseService = courseService;
             _seminargroupService = seminargroupService;
             _userService = userService;
             _classService = classService;
@@ -67,23 +69,48 @@ namespace Xmu.Crms.Group1_7
         }
 
         [HttpGet("api/seminar/{seminarId:long}/{classId}")]
-        public IActionResult GetSeminarById([FromRoute] long seminarId,long classId)
+        public IActionResult GetSeminarBytwoId([FromRoute] long seminarId,long classId)
         {
+            try
+            {
+                var att = _db.Attendences.SingleOrDefault(c => c.ClassId == classId && c.SeminarId == seminarId && c.StudentId == User.Id());
+                string atten;
+                if (att == null)
+                    atten = "no";
+                else
+                    atten = att.AttendanceStatus.ToString();
+                return Json(new
+                {
+                    attendance = atten,
+                    statu = _db.Location.SingleOrDefault(c => c.ClassInfoId == classId && c.SeminarId == seminarId).Status
+                });
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
+        }
+
+        [HttpGet("api/seminar/{seminarId:long}/{classId}/detail")]
+        public IActionResult GetSeminarDetailById([FromRoute] long seminarId,long classId)
+        {
+            var seminar = _seminarService.GetSeminarBySeminarId(seminarId);
+            var course = _courseService.GetCourseByCourseId(seminar.CourseId);
+            var Class = _classService.GetClassByClassId(classId);
+            var teacher = _userService.GetUserByUserId(course.TeacherId);
             try
             {
                 return Json(new
                 {
-                    statu = _db.Location.SingleOrDefault(c => c.ClassInfoId == classId && c.SeminarId == seminarId).Status
+                    teacherName = teacher.Name,
+                    teacherEmail = teacher.Email,
+                    startTime = seminar.StartTime.ToString("yyyy-MM-dd"),
+                    site = Class.Site
                 });
             }
-            catch (SeminarNotFoundException)
+            catch (NullReferenceException)
             {
-                return StatusCode(404, new { msg = "讨论课不存在" });
-
-            }
-            catch (ArgumentException)
-            {
-                return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
+                return null;
             }
         }
 
@@ -122,11 +149,31 @@ namespace Xmu.Crms.Group1_7
             }
             catch (SeminarNotFoundException)
             {
-                return StatusCode(404, new { msg = "讨论课不存在" });
+                return StatusCode(404, "讨论课不存在");
             }
             catch (ArgumentException)
             {
-                return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
+                return StatusCode(400, "讨论课ID输入格式有误");
+            }
+        }
+
+        [HttpPost("api/seminar/{seminarId:long}/{classId}/callinroll")]
+        public IActionResult CreateTopicBySeminarId(long seminarId,long classId, [FromBody]dynamic json)
+        {
+            try
+            {
+                double longitude = (double)json.longitude;
+                double latitude = (double)json.latitude;
+                long attendenceId = _userService.InsertAttendanceById(classId, seminarId, User.Id(), longitude, latitude);
+                return NoContent();
+            }
+            //catch (Shared.Exceptions.InvalidOperationException e)
+            //{
+            //    return StatusCode(250, e.GetAlertInfo());
+            //}
+            catch (UserNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
             }
         }
 

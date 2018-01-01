@@ -23,7 +23,7 @@
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "?" + window.localStorage.getItem("classID"),
+                    url: "/api/seminar/" + window.localStorage.getItem("seminarID"),
                     data: "",
                     contentType: "application/json; charset=utf-8",
                     headers: { "Authorization": "Bearer " + token },

@@ -19,38 +19,70 @@
     <script>
         $(document).ready(function ()
         {
+            var token = window.localStorage.getItem("jwt");
+            var array = new Array();
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/course/13",
+                    url: "/api/course/" + window.localStorage.getItem("courseID"),
                     data: "",
                     contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result)
                     {
-                        $("#teacherName").text("老师: " + result.Data.teacherName);
-                        $("#teacherMail").text("邮箱: " + result.Data.teacherMail);
-                        $.ajax(
-                            {
-                                type: 'GET',
-                                url: "/api/course/13/class",
-                                data: "",
-                                contentType: "application/json; charset=utf-8",
-                                dataType: "json",
-                                success: function (result)
-                                {
-                                    $.each(result.Data, function (i, value)
-                                    {
-                                        if (i == 0)
-                                        {
-                                            $("#defaultValue").text(value.name);
-                                        }
-                                        $("#lis").append('<li>' + '<a href="#">' + value.name + '</a>' + '</li>');
-                                    });
-                                }
-                            })
+                        $("#teacherName").text("老师: " + result.teacher.name);
+                        $("#teacherMail").text("邮箱: " + result.teacher.email);
+                        
+                        $("#teacherDes").text("简介: " + result.description);
                     }
                 })
+            $.ajax(
+                {
+                     type: 'GET',
+                     url: "/api/course/" + window.localStorage.getItem("courseID") + "/class",
+                     data: "",
+                     contentType: "application/json; charset=utf-8",
+                     headers: { "Authorization": "Bearer " + token },
+                     dataType: "json",
+                     success: function (result) {
+                         $.each(result, function (i, value) {
+                             if (i == 0) {
+                                 $("#defaultValue").text(value.name);
+                                 $("#location").text("地点：" + value.site);
+                                 $("#number").text("班级人数：" + value.number);
+                             }
+                             $("#lis").append('<li>' + '<a href="#" class="abc">' + value.name + '</a>' + '</li>');
+                             array.push(value);
+                         });
+                         //window.localStorage.setItem('classID', array[0].id);
+                        }
+                })
+            $(document).on("click", ".abc", function () {
+                var a = this.text;
+                // alert(a);
+                for (var x in array) {
+                    // alert(array2[x]);
+
+                    if (a == array[x].name) {
+                        //window.localStorage.setItem('seminarID', array[x].id);
+                        //e.preventDefault();  // 阻止链接跳转
+                        //var url = this.href;  // 保存点击的地址
+                        
+                        //$('nav a.current').removeClass('current');
+                        //$(this).addClass('current');
+                        
+                        //$('#container').remove();
+                        //$('#content').load(url + ' #container').fadeIn('slow'); // 加载新内容,url地址与该地址下的选择器之间要有空格,表示该url下的#container
+                        $("#defaultValue").text(array[x].name);
+                        $("#location").text("地点："+array[x].site);
+                        $("#number").text("班级人数："+array[x].number);
+                        break;
+                    }
+
+                }
+                //$(window).attr("location", '/SeminarUI/Seminar');
+            })
         })
     </script>
 </head>
@@ -64,7 +96,7 @@
     </div>
     <div>
         <img class="MailImg" src="~/images/CourseInfo/MailIcon.png" />
-        <p class="MailText" id="teacherMail">邮箱：qiuming@gmail.com</p>
+        <p class="MailText" id="teacherMail"></p>
     </div>
     <div>
         <img src="~/images/CourseInfo/HouseIcon.png" class="HouseImg" />
@@ -77,19 +109,19 @@
                 data-toggle="dropdown" style="float:left;position: relative;font-size: 1em;" id="defaultValue">
             <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="lis">
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="lis" style="font-size: 1em;">
         </ul>
     </div>
 
     <div class="SmallText">
-        <span>地点: 学生公寓405 </span>
+        <span id="location">地点： </span>
     </div>
     <div class="SmallText">
-        <span>班级人数:31人 </span>
+        <span id="number">班级人数： </span>
     </div>
     <div>
         <img src="~/images/CourseInfo/FileIcon.png" class="PaperImg" />
-        <p class="IntroText">简介</p>
+        <p class="IntroText" id="teacherDes">简介</p>
     </div>
 </body>
 </html>

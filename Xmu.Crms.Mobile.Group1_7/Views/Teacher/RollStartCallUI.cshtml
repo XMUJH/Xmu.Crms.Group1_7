@@ -73,7 +73,7 @@
                         headers: { "Authorization": "Bearer " + token },
                         dataType: "json",
                         success: function (result) {
-                            $(window).attr("location", "/Teacher/FixedRollCallUI");
+                            $(window).attr("location", "/Teacher/RollCallUI");
                         },
                         error: function (data) {
                             alert(data.responseText);

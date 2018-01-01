@@ -40,26 +40,26 @@ namespace Xmu.Crms.Mobile.Group1_7.Controllers
             return View();
         }
 
-        [Route("Teacher/FixedRollStartCallUI")]
-        public IActionResult FixedRollStartCallUI()
+        [Route("Teacher/RollStartCallUI")]
+        public IActionResult RollStartCallUI()
         {
             return View();
         }
 
-        [Route("Teacher/FixedRollCallUI")]
-        public IActionResult FixedRollCallUI()
+        [Route("Teacher/RollCallUI")]
+        public IActionResult RollCallUI()
         {
             return View();
         }
 
-        [Route("Teacher/FixedRollCallEndUI")]
-        public IActionResult FixedRollCallEndUI()
+        [Route("Teacher/RollCallEndUI")]
+        public IActionResult RollCallEndUI()
         {
             return View();
         }
 
-        [Route("Teacher/FixedEndRollCallUI")]
-        public IActionResult FixedEndRollCallUI()
+        [Route("Teacher/EndRollCallUI")]
+        public IActionResult EndRollCallUI()
         {
             return View();
         }

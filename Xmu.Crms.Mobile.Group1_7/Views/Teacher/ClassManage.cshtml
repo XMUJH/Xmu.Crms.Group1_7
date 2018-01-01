@@ -75,8 +75,7 @@
                         break;
                     }
                 }
-                if (window.localStorage.getItem("groupingMethod") == "fixed") $(window).attr("location", '/Teacher/FixedRollStartCallUI');
-                else $(window).attr("location", '/Teacher/RandomRollStartCallUI');
+                $(window).attr("location", '/Teacher/RollStartCallUI');
             })
         });
     </script>

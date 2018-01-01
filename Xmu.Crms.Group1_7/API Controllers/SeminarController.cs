@@ -19,20 +19,22 @@ namespace Xmu.Crms.Group1_7
         private readonly ISeminarService _seminarService;
         private readonly ITopicService _topicService;
         private readonly IUserService _userService;
+        private readonly ICourseService _courseService;
         private readonly CrmsContext _db;
         private readonly ISeminarGroupService _seminargroupService;
 
-        public SeminarController(ISeminarService seminarService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, CrmsContext db)
+        public SeminarController(ISeminarService seminarService, ICourseService courseService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, CrmsContext db)
         {
             _seminarService = seminarService;
             _topicService = topicService;
+            _courseService = courseService;
             _seminargroupService = seminargroupService;
             _userService = userService;
             _db = db;
         }
 
-        [HttpGet("/seminar/{seminarId:long}")]
-        public IActionResult GetSeminarById([FromRoute] long seminarId)
+        [HttpGet("api/seminar/{seminarId}")]
+        public IActionResult GetSeminarById(long seminarId)
         {
             try
             {
@@ -41,6 +43,10 @@ namespace Xmu.Crms.Group1_7
                 {
                     id = sem.Id,
                     name = sem.Name,
+                    coursename = _courseService.GetCourseByCourseId(sem.CourseId).Name,
+                    attendence = (_db.Attendences.SingleOrDefault(c => c.SeminarId == seminarId && c.StudentId == User.Id()) == null) ? -1 : long.Parse(_db.Attendences.SingleOrDefault(c => c.SeminarId == seminarId && c.StudentId == User.Id()).AttendanceStatus.ToString()),
+                    statu = _db.Location.SingleOrDefault(c => c.SeminarId == seminarId).Status,
+                    isfixed = sem.IsFixed,
                     description = sem.Description,
                     startTime = sem.StartTime.ToString("yyyy-MM-dd"),
                     endTime = sem.EndTime.ToString("yyyy-MM-dd")
@@ -57,7 +63,25 @@ namespace Xmu.Crms.Group1_7
             }
         }
 
-        [HttpPut("/seminar/{seminarId:long}")]
+        [HttpGet("api/seminar/{seminarId}/{classId}")]
+        public IActionResult GetSeminarBytwoId(long seminarId,long classId)
+        {
+            try
+            {
+                return Json(new
+                {
+                    //attendence = (_db.Attendences.SingleOrDefault(c => c.SeminarId == seminarId && c.StudentId == User.Id()) == null) ? -1 : long.Parse(_db.Attendences.SingleOrDefault(c => c.SeminarId == seminarId && c.StudentId == User.Id()).AttendanceStatus.ToString()),
+                    statu = _db.Location.SingleOrDefault(c => c.SeminarId == seminarId && c.ClassInfoId == classId).Status,
+                });
+            }
+            catch (SeminarNotFoundException)
+            {
+                return StatusCode(404, new { msg = "讨论课不存在" });
+
+            }
+        }
+
+        [HttpPut("api/seminar/{seminarId:long}")]
         public IActionResult UpdateSeminarById([FromRoute] long seminarId, [FromBody] Seminar updated)
         {
             if (User.Type() != Type.Teacher)
@@ -78,7 +102,8 @@ namespace Xmu.Crms.Group1_7
                 return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
             }
         }
-        [HttpDelete("/seminar/{seminarId:long}")]
+
+        [HttpDelete("api/seminar/{seminarId:long}")]
         public IActionResult DeleteSeminarById([FromRoute] long seminarId)
         {
             if (User.Type() != Type.Teacher)
@@ -101,7 +126,7 @@ namespace Xmu.Crms.Group1_7
         }
 
         //groupLeft未加
-        [HttpGet("/seminar/{seminarId:long}/topic")]
+        [HttpGet("api/seminar/{seminarId:long}/topic")]
         public IActionResult GetTopicsBySeminarId([FromRoute] long seminarId)
         {
             try
@@ -127,7 +152,7 @@ namespace Xmu.Crms.Group1_7
             }
         }
 
-        [HttpPost("/seminar/{seminarId:long}/topic")]
+        [HttpPost("api/seminar/{seminarId:long}/topic")]
         public IActionResult CreateTopicBySeminarId([FromRoute] long seminarId, [FromBody] Topic newTopic)
         {
             if (User.Type() != Type.Teacher)
@@ -140,7 +165,7 @@ namespace Xmu.Crms.Group1_7
         }
 
         //没有小组成员 和 report
-        [HttpGet("/seminar/{seminarId:long}/group")]
+        [HttpGet("api/seminar/{seminarId:long}/group")]
         public IActionResult GetGroupsBySeminarId([FromRoute] long seminarId)
         {
             try
@@ -162,7 +187,7 @@ namespace Xmu.Crms.Group1_7
             }
         }
 
-        [HttpGet("/seminar/{seminarId:long}/group/my")]
+        [HttpGet("api/seminar/{seminarId:long}/group/my")]
         public IActionResult GetStudentGroupBySeminarId([FromRoute] long seminarId)
         {
             if (User.Type() != Type.Student)

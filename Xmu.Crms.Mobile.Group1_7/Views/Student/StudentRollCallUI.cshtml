@@ -11,27 +11,30 @@
                                      maximum-scale=1.0">
     <title>Untitled Document</title>
     <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=DlUrIQyBBsBYYV3gxkYX4G6xAzDSux5I"></script>
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="~/css/StudentRollCallUI.css" rel="stylesheet" type="text/css">
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-    
+
 
     <script>
         $(document).ready(function () {
+            var token = window.localStorage.getItem("jwt");
             $.ajax({
                 type: 'GET',
-                url: "/api/seminar/23/detail",
+                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/" + window.localStorage.getItem("classID") + "/detail",
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
                 success: function (result) {
-                    $("#teacherName").text(result.Data[0].teacherName);
-                    $("#teacherEmail").text(result.Data[0].teacherEmail);
-                    $("#startTime").text(result.Data[0].startTime);
-                    $("#site").text(result.Data[0].site);
+                    $("#teacherName").text(result.teacherName);
+                    $("#teacherEmail").text(result.teacherEmail);
+                    $("#startTime").text(result.startTime);
+                    $("#site").text(result.site);
 
                     $("#successCall").append('<button type="button" class="blueBigBtn">签到</button > ');
                 }
@@ -39,20 +42,36 @@
             })
         });
         $(document).on("click", "#successCall", function () {
-            $.ajax({
-                type: 'GET',
-                url: "/api/course/23/seminar/current",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    with (document.getElementById("successCall").style) { (display = "none") };
-                    var imgClock = "<img src=\"/images/themes/clock.png\" class=\'courseInfoIcon\' />";
-                    $(".lowBox").after('<div class="successCall">' + imgClock + '<strong>签到成功</strong></div> ');
+            var token = window.localStorage.getItem("jwt");
+            var geolocation = new BMap.Geolocation();
+            geolocation.getCurrentPosition(function (r) {
+                if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                    //alert('您的位置：' + r.point.lng + ',' + r.point.lat);
+                    //var longitude = r.point.lng;
+                    //var latitude = r.point.lat;
+                    var data0 = { longitude: r.point.lng,latitude:r.point.lat};
+                    $.ajax({
+                        type: 'POST',
+                        url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/" + window.localStorage.getItem("classID") + "/callinroll",
+                        data: JSON.stringify(data0),
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (result) {
+                            with (document.getElementById("successCall").style) { (display = "none") };
+                            var imgClock = "<img src=\"/images/themes/clock.png\" class=\'courseInfoIcon\' />";
+                            $(".lowBox").after('<div class="successCall">' + imgClock + '<strong>签到成功</strong></div> ');
+                        },
+                        error: function (result) {
+                            alert(result.responseText);
+                        }
+                    })
+                }                      
+                else {
+                    alert('failed get location');
                 }
-
+            });
             })
-        })
     </script>
 
 </head>

@@ -36,12 +36,13 @@
                         $(".title2").text(result.name);
                         if (result.isfixed == true)
                             document.getElementById("groupArea").setAttribute("class", "GroupBox");
-                        else{
-                            if (result.attendence > 0 && result.attendence < 2)
-                                document.getElementById("groupArea").setAttribute("class", "GroupBox");
-                            else
-                                document.getElementById("groupArea").setAttribute("class", "greyGroupBox");
-                        }
+                       // else{
+                            //if (result.attendance >= 0 && result.attendance < 2)
+                            //    document.getElementById("groupArea").setAttribute("class", "GroupBox");
+                            //else
+                            //alert("123")
+                                //document.getElementById("groupArea").setAttribute("class", "greyGroupBox");
+                       // }
                     }
                 })
             $.ajax(
@@ -53,6 +54,7 @@
                     headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result) {
+                        //alert(result.attendance)
                         if (result.statu == 1) {
                             document.getElementById("CallTheRoll").setAttribute("class", "CallBox");
                             document.getElementById("gradeOthers").setAttribute("class", "ScoreBox");
@@ -60,6 +62,13 @@
                         else {
                             document.getElementById("CallTheRoll").setAttribute("class", "greyCallBox");
                             document.getElementById("gradeOthers").setAttribute("class", "greyScoreBox");
+                        }
+                        if (result.attendance == "Present" || result.attendance == "Late") {
+                            
+                            document.getElementById("groupArea").setAttribute("class", "GroupBox");
+                        }
+                        else {
+                            document.getElementById("groupArea").setAttribute("class", "greyGroupBox");
                         }
                     }
                 })

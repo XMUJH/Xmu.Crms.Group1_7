@@ -27,10 +27,12 @@ namespace Xmu.Crms.Group1_7
         ISeminarService _seminarService;
         IGradeService _gradeService;
         ISeminarGroupService _seminarGroupService;
+        IUserService _userService;
         private readonly JwtHeader _header;
-        public CourseController(CrmsContext db, ICourseService courseService, IClassService classService, ISeminarService seminarService, IGradeService gradeService,ISeminarGroupService seminarGroupService, JwtHeader header)
+        public CourseController(CrmsContext db,IUserService userService, ICourseService courseService, IClassService classService, ISeminarService seminarService, IGradeService gradeService,ISeminarGroupService seminarGroupService, JwtHeader header)
         {
             _db = db;
+            _userService = userService;
             _courseService = courseService;
             _classService = classService;
             _seminarService = seminarService;
@@ -182,17 +184,13 @@ namespace Xmu.Crms.Group1_7
                 var classes = _classService.ListClassByCourseId(courseId);
                 return Json(classes.Select(c => new {
                     id = c.Id,
-                    name = c.Name
-
-,
+                    name = c.Name,
                     time = c.ClassTime,
                     site = c.Site,
-                    courseTeacher = c.Course.Teacher.Name
-
-,
-                    courseName = c.Course.Name
-
-                }));
+                    number = _userService.ListUserByClassId(c.Id, "", "").Count
+                //courseTeacher = c.Course.Teacher.Name,
+                //courseName = c.Course.Name
+            }));
             }
             catch (CourseNotFoundException)
             {

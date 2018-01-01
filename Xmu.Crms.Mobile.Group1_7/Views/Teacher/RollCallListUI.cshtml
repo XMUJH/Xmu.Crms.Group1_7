@@ -17,44 +17,50 @@
     <link rel="stylesheet" href="~/css/RollCallListUI.css">
     <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
     <script>
-        $(document).ready(function () {
+        var token = window.localStorage.getItem("jwt");
+        $(document).ready(function ()
+        {
             $.ajax({
                 type: "GET",
-                url: "/api/class/23",
+                url: "/api/class/" + window.localStorage.getItem("classID"),
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
-                success: function (result) {
-                    $("#className").text(result.Data.name);
-                }
-            })
-            $.ajax({
-                type: "GET",
-                url: "/api/seminar/52/class/32/attendance",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $("#numPresent").append("签到学生：" + result.Data.numPresent + "/" + result.Data.numStudent);
-                }
-            })
-            $.ajax({
-                type: 'GET',
-                url: "/api/seminar/52/class/32/attendance/present",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $.each(result.Data, function (i, value) {
-                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
-                        if (i % 2 == 0)
-                            $("#students").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
-                        else
-                            $("#students").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                success: function (result)
+                {
+                    $("#className").text(result.name);
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/present",
+                        data: "",
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (result2)
+                        {
+                            $("#numPresent").append("已签到学生：" + result2.numPresent + "/" + result.numStudent);
+                            $.each(result2.attendances, function (i, value)
+                            {
+                                var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                                if (i % 2 == 0)
+                                    $("#students").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                else
+                                    $("#students").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
 
-                    });
-                }
+                            });
+                        },
+                        error: function (data2)
+                        {
+                            alert(data2.responseText);
 
+                        }
+                    })
+                },
+                error: function (data)
+                {
+                    alert(data.responseText);
+                }
             })
         });
     </script>

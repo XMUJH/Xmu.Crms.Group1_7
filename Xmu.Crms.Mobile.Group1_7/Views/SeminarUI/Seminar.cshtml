@@ -19,36 +19,48 @@
     <script>
         $(document).ready(function ()
         {
+            var token = window.localStorage.getItem("jwt");
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/seminar/13",
+                    url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "?" + window.localStorage.getItem("classID"),
                     data: "",
                     contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result)
                     {
-                      //  var myDate = getNowFormatDate();
-                       // if (CompareDate(myDate, result.Data.startTime) && CompareDate(result.Data.endTime, myDate))
-                       // {
+                        //alert(result.name);
+                        //alert(result.isfixed)
+                        $(".title").text(result.coursename);
+                        $(".title2").text(result.name);
+                        if (result.isfixed == true)
+                            document.getElementById("groupArea").setAttribute("class", "GroupBox");
+                        else{
+                            if (result.attendence > 0 && result.attendence < 2)
+                                document.getElementById("groupArea").setAttribute("class", "GroupBox");
+                            else
+                                document.getElementById("groupArea").setAttribute("class", "greyGroupBox");
+                        }
+                    }
+                })
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/" + window.localStorage.getItem("classID"),
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.statu == 1) {
                             document.getElementById("CallTheRoll").setAttribute("class", "CallBox");
                             document.getElementById("gradeOthers").setAttribute("class", "ScoreBox");
-                      //  }
-                        //else
-                       // {
-                           // document.getElementById("CallTheRoll").setAttribute("class", "greyCallBox");
-                           // document.getElementById("gradeOthers").setAttribute("class", "greyScoreBox");
-                       // }
-                       // if (result.groupingMethod == "fixed")
-                        //{
-                            var temp =window.localStorage;
-                            temp["currentGM"] = result.Data.groupingMethod;
-                            document.getElementById("groupArea").setAttribute("class", "GroupBox");
-                       // }
-                       // else
-                        //{
-                         //   document.getElementById("groupArea").setAttribute("class", "greyGroupBox");
-                       // }
+                        }
+                        else {
+                            document.getElementById("CallTheRoll").setAttribute("class", "greyCallBox");
+                            document.getElementById("gradeOthers").setAttribute("class", "greyScoreBox");
+                        }
                     }
                 })
         })
@@ -65,40 +77,21 @@
         {
             $(window).attr("location", '/Student/Score');
         })
-        function CompareDate(d1, d2)
-        {
-            return ((new Date(d1.replace(/-/, "\/"))) > (new Date(d2.replace(/-/, "\/"))));
-        }
-        function getNowFormatDate()
-        {
-            var date = new Date();
-            var seperator1 = "-";
-            var year = date.getFullYear();
-            var month = date.getMonth() + 1;
-            var strDate = date.getDate();
-            if (month >= 1 && month <= 9) {
-                month = "0" + month;
-            }
-            if (strDate >= 0 && strDate <= 9) {
-                strDate = "0" + strDate;
-            }
-            var currentdate = year + seperator1 + month + seperator1 + strDate;
-            return currentdate;
-        }
     </script>
+
 </head>
 <body class="body">
     <div class="topBox">
-        <span class="title"> OOAD</span>
-        <span class="title2"> 讨论课4</span>
+        <span class="title"></span>
+        <span class="title2"></span>
     </div>
-    <div id="gradeOthers">
+    <div id="gradeOthers" class="ScoreBox">
         <span class="ScoreText">打分</span>
     </div>
-    <div id="CallTheRoll">
+    <div id="CallTheRoll" class="CallBox">
         <span class="CallText">签到</span>
     </div>
-    <div id="groupArea">
+    <div id="groupArea" class="GroupBox">
         <span class="GroupText">组队和选题</span>
     </div>
 </body>

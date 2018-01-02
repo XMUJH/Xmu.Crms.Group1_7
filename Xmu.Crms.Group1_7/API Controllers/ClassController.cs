@@ -36,7 +36,7 @@ namespace Xmu.Crms.Group1_7
         [Produces("application/json")]
         //获取与当前用户相关的或者符合条件的班级列表
         //GET:/class
-        [HttpGet("api/class")]
+        [HttpGet("api/class/")]
         public IActionResult GetClass(long courseId)
         {
             try

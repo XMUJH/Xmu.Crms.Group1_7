@@ -415,6 +415,35 @@ namespace Xmu.Crms.Services.Group2_10
         /// <returns>SeminarGroup Group的相关信息</returns>
         /// <exception cref="T:System.ArgumentException">id格式错误</exception>
         /// <exception cref="T:Xmu.Crms.Shared.Exceptions.GroupNotFoundException">未找到小组</exception>
+        //public SeminarGroup GetSeminarGroupById(long seminarId, long userId)
+        //{
+        //    if (userId < 0 || seminarId < 0)
+        //    {
+        //        throw new ArgumentException();
+        //    }
+
+        //    var seminar = _db.Seminar.Find(seminarId);
+        //    if (seminar == null)
+        //    {
+        //        throw new SeminarNotFoundException();
+        //    }
+
+        //    var user = _db.UserInfo.Find(userId);
+        //    if (user == null)
+        //    {
+        //        throw new UserNotFoundException();
+        //    }
+
+        //    var seminarmember = _db.SeminarGroupMember.Include(s => s.Student).Include(s => s.SeminarGroup)
+        //        .ThenInclude(sem => sem.Seminar).Where(s => s.Student.Id == userId)
+        //        .SingleOrDefault(sg => sg.SeminarGroup.Seminar.Id == seminarId);
+        //    if (seminarmember == null)
+        //    {
+        //        throw new System.InvalidOperationException();
+        //    }
+
+        //    return seminarmember.SeminarGroup;
+        //}
         public SeminarGroup GetSeminarGroupById(long seminarId, long userId)
         {
             List<SeminarGroup> SeminarGroups;
@@ -454,6 +483,7 @@ namespace Xmu.Crms.Services.Group2_10
             //没找到小组，抛出异常
             throw new GroupNotFoundException();
         }
+
 
         /// <summary>
         /// 查询讨论课小组队长id.

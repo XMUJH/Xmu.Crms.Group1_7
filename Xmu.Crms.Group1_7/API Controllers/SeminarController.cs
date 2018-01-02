@@ -28,15 +28,17 @@ namespace Xmu.Crms.Group1_7
         private readonly CrmsContext _db;
         private readonly ISeminarGroupService _seminargroupService;
         private readonly IClassService _classService;
+        private readonly IFixGroupService _fixGroupService;
 
-        public SeminarController(ISeminarService seminarService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, IClassService classService, CrmsContext db)
+        public SeminarController(ISeminarService seminarService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, IClassService classService, IFixGroupService fixGroupService, CrmsContext db)
         {
             _seminarService = seminarService;
             _topicService = topicService;
             _seminargroupService = seminargroupService;
             _userService = userService;
             _classService = classService;
-            _db = db;
+            _fixGroupService = fixGroupService;
+           _db = db;
         }
 
         [HttpGet("api/seminar/{seminarId:long}")]
@@ -76,14 +78,9 @@ namespace Xmu.Crms.Group1_7
                     statu = _db.Location.SingleOrDefault(c => c.ClassInfoId == classId && c.SeminarId == seminarId).Status
                 });
             }
-            catch (SeminarNotFoundException)
+            catch(NullReferenceException)
             {
-                return StatusCode(404, new { msg = "讨论课不存在" });
-
-            }
-            catch (ArgumentException)
-            {
-                return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
+                return null;
             }
         }
 
@@ -169,27 +166,114 @@ namespace Xmu.Crms.Group1_7
             return Created("/topic/" + topicid, newTopic);
         }
 
-        //没有小组成员 和 report
+        ////没有小组成员 和 report
+        //[HttpGet("api/seminar/{seminarId:long}/group")]
+        //public IActionResult GetGroupsBySeminarId([FromRoute] long seminarId)
+        //{
+        //    try
+        //    {
+        //        var groups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
+        //        return Json(groups.Select(t => new
+        //        {
+        //            id = t.Id,
+        //            name = t.Id + "组"
+        //        }));
+        //    }
+        //    catch (SeminarNotFoundException)
+        //    {
+        //        return StatusCode(404, new { msg = "讨论课不存在" });
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
+        //    }
+        //}
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("api/seminar/{seminarId:long}/group")]
-        public IActionResult GetGroupsBySeminarId([FromRoute] long seminarId)
+        public IActionResult GetGroup(long seminarId, [FromQuery]bool isFixed, [FromQuery]bool gradeable, [FromQuery]long classid, [FromQuery]bool include)
         {
-            try
+            var userId = User.Id();
+            if (gradeable)
             {
-                var groups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
-                return Json(groups.Select(t => new
+              //  name = "组";
+                var group = _seminargroupService.GetSeminarGroupById(seminarId, userId);
+                var groupTopics = _topicService.ListSeminarGroupTopicByGroupId(group.Id);
+                var allGroups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
+                List<SeminarGroup> groups = allGroups.ToList<SeminarGroup>();
+                List<SeminarGroupTopic> topics = new List<SeminarGroupTopic>();
+                var sg = _seminargroupService.GetSeminarGroupByGroupId(groupTopics.First().SeminarGroup.Id);
+                if (groupTopics.Count == 1)
                 {
-                    id = t.Id,
-                    name = t.Id + "组"
-                }));
+                    foreach (var g in allGroups)
+                    {
+                        var t = _topicService.ListSeminarGroupTopicByGroupId(g.Id);
+                        if (t.Count <= 0 || g.Id == group.Id || t.First().Id == groupTopics.First().Id)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            var sg2 = _seminargroupService.GetSeminarGroupByGroupId(t.First().SeminarGroup.Id);
+                            if (sg2.ClassInfo.Id != sg.ClassInfo.Id)
+                                continue;
+                        }
+                        topics.Add(t.First());
+                    }
+                }
+                else
+                {
+                    foreach (var g in allGroups)
+                    {
+                        if (g.Id != group.Id)
+                        {
+                            var t = _topicService.ListSeminarGroupTopicByGroupId(g.Id);
+                            if (t.Count <= 0)
+                            {
+                                continue;
+                            }
+                            var sg2 = _seminargroupService.GetSeminarGroupByGroupId(t.First().SeminarGroup.Id);
+                            if (sg2.ClassInfo.Id != sg.ClassInfo.Id)
+                                continue;
+                            topics.Add(t.First());
+                        }
+                    }
+                }
+                return Json(topics.GroupBy(g => g.Topic));
             }
-            catch (SeminarNotFoundException)
+            if (classid != 0)
             {
-                return StatusCode(404, new { msg = "讨论课不存在" });
+                if (!isFixed)
+                {
+                    var t = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
+                    List<SeminarGroup> groups = new List<SeminarGroup>();
+                    foreach (var g in t)
+                    {
+                        if (g.ClassInfo.Id == classid) groups.Add(g);
+                    }
+                    return Json(groups);
+                }
+                else
+                {
+                    var groups = _fixGroupService.ListFixGroupByClassId(classid);
+                    return Json(groups);
+                }
             }
-            catch (ArgumentException)
+            if (include)
             {
-                return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
+                try
+                {
+                    var group = _seminargroupService.GetSeminarGroupById(seminarId, userId);
+                    var members = _seminargroupService.ListSeminarGroupMemberByGroupId(group.Id);
+                    return Json(new { group = group, members = members });
+                }
+                catch (Exception e)
+                {
+                    return Json("no");
+                }
+
             }
+            else
+                return Json(new { status = "false" });
         }
 
         [HttpGet("api/seminar/{seminarId:long}/group/my")]

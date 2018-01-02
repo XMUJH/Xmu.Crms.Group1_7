@@ -63,7 +63,7 @@
                             document.getElementById("CallTheRoll").setAttribute("class", "greyCallBox");
                             document.getElementById("gradeOthers").setAttribute("class", "greyScoreBox");
                         }
-                        if (result.attendance == "Present" || result.attendance == "Late") {
+                        if (result.statu == 0) {
                             
                             document.getElementById("groupArea").setAttribute("class", "GroupBox");
                         }
@@ -75,7 +75,25 @@
         })
         $(document).on("click", ".GroupBox", function ()
         {
-            $(window).attr("location", '/GroupUI/GroupUI');
+            var token = window.localStorage.getItem("jwt");
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/group/" + window.localStorage.getItem("seminarID") + "/" + window.localStorage.getItem("id"),
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
+                    dataType: "json",
+                    success: function (result) {
+                        window.localStorage.setItem("groupID", result.id);
+                        window.localStorage.setItem("leaderID", result.leaderId);
+                        $(window).attr("location", '/GroupUI/GroupUI');
+                    },
+                    error: function (result) {
+                        alert(result.responseText);
+                    }
+                })
+            
         })
         $(document).on("click", ".CallBox", function ()
         {
@@ -84,7 +102,25 @@
         })
         $(document).on("click", ".ScoreBox", function ()
         {
-            $(window).attr("location", '/Student/Score');
+            var token = window.localStorage.getItem("jwt");
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "/api/group/" + window.localStorage.getItem("seminarID") + "/" + window.localStorage.getItem("id"),
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
+                    dataType: "json",
+                    success: function (result) {
+                        window.localStorage.setItem("groupID", result.id);
+                        window.localStorage.setItem("leaderID", result.leaderId);
+                        $(window).attr("location", '/Student/Score');
+                    },
+                    error: function (result) {
+                        alert(result.responseText);
+                    }
+                })
+            
         })
     </script>
 

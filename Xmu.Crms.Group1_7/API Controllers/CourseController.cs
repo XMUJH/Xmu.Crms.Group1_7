@@ -287,7 +287,7 @@ namespace Xmu.Crms.Group1_7
                     id = s.Id,
                     name = s.Name,
                     description = s.Description,
-                    groupingMethod = (s.IsFixed == true) ? "fixed" : "random",
+                    groupingMethod = (s.IsFixed == true) ? "固定分组" : "随机分组",
                     startTime = s.StartTime.ToString("M"),
                     endTime = s.EndTime.ToString("M"),
                     Judge = ((DateTime.Compare(dt, s.StartTime) > 0) && (DateTime.Compare(s.EndTime, dt) > 0)) ? 1 : 0,

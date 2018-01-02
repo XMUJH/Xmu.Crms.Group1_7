@@ -55,7 +55,7 @@
                     dataType: "json",
                     success: function (result) {
                         //alert(result.attendance)
-                        if (result.statu == 1) {
+                        if (result.statu == 1 || result.statu == 0) {
                             document.getElementById("CallTheRoll").setAttribute("class", "CallBox");
                             document.getElementById("gradeOthers").setAttribute("class", "ScoreBox");
                         }

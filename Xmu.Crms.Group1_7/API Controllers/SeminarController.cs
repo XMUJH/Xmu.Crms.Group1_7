@@ -164,8 +164,8 @@ namespace Xmu.Crms.Group1_7
             {
                 double longitude = (double)json.longitude;
                 double latitude = (double)json.latitude;
-                long attendenceId = _userService.InsertAttendanceById(classId, seminarId, User.Id(), longitude, latitude);
-                return NoContent();
+                long attendanceId = _userService.InsertAttendanceById(classId, seminarId, User.Id(), longitude, latitude);
+                return Json(attendanceId);
             }
             //catch (Shared.Exceptions.InvalidOperationException e)
             //{

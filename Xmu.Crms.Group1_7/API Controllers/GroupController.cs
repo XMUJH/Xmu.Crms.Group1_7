@@ -409,12 +409,13 @@ namespace Xmu.Crms.Group1_7
         //提交对其他小组的打分
         //PUT:/group/{groupId}/grade/presentation/{studentId}
         //[FromBody]dynamic presentation
-        [HttpPut("api/group/{groupId}/grade/presentation")]
-        public IActionResult SubmitPresentationGrade([FromRoute]long groupId, [FromQuery]long studentId, [FromQuery]long topicId, [FromQuery]int grade)
+        [HttpPut("api/group/{groupId}/grade/presentation/{topicId}/{grade}")]
+        public IActionResult SubmitPresentationGrade([FromRoute]long groupId, long topicId, int grade)
         {
             try
             {
-                _gradeService.InsertGroupGradeByUserId(topicId, studentId, groupId, grade);
+                //if(groupId)
+                _gradeService.InsertGroupGradeByUserId(topicId, User.Id(), groupId, grade);
             }
             catch (GroupNotFoundException)
             {

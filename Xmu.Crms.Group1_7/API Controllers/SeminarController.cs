@@ -31,7 +31,7 @@ namespace Xmu.Crms.Group1_7
         private readonly IClassService _classService;
         private readonly IFixGroupService _fixGroupService;
 
-        public SeminarController(ISeminarService seminarService, ITopicService topicService, ISeminarGroupService seminargroupService, IUserService userService, IClassService classService, CrmsContext db)
+        public SeminarController(ISeminarService seminarService, ICourseService courseService,ITopicService topicService, ISeminarGroupService seminargroupService, IFixGroupService fixGroupService,IUserService userService, IClassService classService, CrmsContext db)
         {
             _seminarService = seminarService;
             _topicService = topicService;
@@ -223,8 +223,8 @@ namespace Xmu.Crms.Group1_7
         //    }
         //}
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet("api/seminar/{seminarId:long}/group")]
-        public IActionResult GetGroup(long seminarId, [FromQuery]bool isFixed, [FromQuery]bool gradeable, [FromQuery]long classid, [FromQuery]bool include)
+        [HttpGet("api/seminar/{seminarId:long}/group/")]
+        public IActionResult GetGroup(long seminarId, [FromQuery]long groupId ,[FromQuery]bool isFixed, [FromQuery]bool gradeable, [FromQuery]long classid, [FromQuery]bool include)
         {
             var userId = User.Id();
             if (gradeable)
@@ -235,7 +235,7 @@ namespace Xmu.Crms.Group1_7
                 var allGroups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
                 List<SeminarGroup> groups = allGroups.ToList<SeminarGroup>();
                 List<SeminarGroupTopic> topics = new List<SeminarGroupTopic>();
-                var sg = _seminargroupService.GetSeminarGroupByGroupId(groupTopics.First().SeminarGroup.Id);
+                var sg = _seminargroupService.GetSeminarGroupByGroupId(groupId);
                 if (groupTopics.Count == 1)
                 {
                     foreach (var g in allGroups)

@@ -18,6 +18,8 @@
         window.localStorage.setItem("gradeStatus", "available");
         $(document).ready(function () {
             var token = window.localStorage.getItem("jwt");
+            var classId = window.localStorage.getItem("classID");
+            var groupId = window.localStorage.getItem("groupID");
             var temp = window.localStorage.getItem("id");
             var studentId = parseInt(temp);
             var count = 0;
@@ -30,19 +32,21 @@
                     "isFixed": false,
                     "gradeable": true,
                     "studentId": studentId,
-                    "classId": 1,
+                    "classId": classId,
+                    "groupId": groupId,
                     "include": false
                 },
                 headers: {
                     "Authorization": "Bearer " + token
                 },
-                success: function (data, status) {
+                success: function (data) {
+                  
                     console.log(data)
                     for (var i in data) {
                         for (var j in data[i]) {
                            var index = parseInt(j) + 1;
-                           var name = data[i][j].topic.serial+ index;
-                           var col = "<div id='" + count + "' class='GradeDiv'><span id='" + data[i][j].id  + "' name='" + data[i][j].topicId + "'class='GroupNum'>" + name
+                           var name = data[i][j].topic.serial + index;
+                           var col = "<div id='" + count + "' class='GradeDiv'><span id='" + data[i][j].seminarGroupId  + "' name='" + data[i][j].topicId + "'class='GroupNum'>" + name
                        // var col = "<div id='" + count + "' class='GradeDiv'><span id='" + data[i].name+ "'name='" + data[i].topicId +  "'class='GroupNum'>" + data[i].name
                                 + "</span> <div> <img id='off' src='/images/Theme/heart_empty.png' class='GroupGradeIcon'/>"
                                 + "<img id='on' style='display:none;' src='/images/Theme/heart_chosen.png' class='GroupGradeIcon'/></div>"
@@ -57,8 +61,10 @@
                             $("#list").append(col);
                             count++;
                         }
-                   }
+                    }
+
                     for (var i = 0; i < count; i++) score[i] = 0;
+               
                 }
             });
             function hclick() {
@@ -77,18 +83,13 @@
                     var groupId = parseInt(t1);
                     $.ajax({
                         type: 'PUT',
-                        url: "/api/group/" + groupId + "/grade/presentation",
-                        //url: "/api/group/" + topicId + "/grade/presentation",
-                        //url: "/api/group/" + groupId + "/grade/presentation/" + studentId,
-                        //url:"/api/group/"+groupId+"/grade/"+score[i]+"/presentation/"+studentId+"/"+topicId,
+                        url: "/api/group/" + groupId + "/grade/presentation/" + topicId + "/" + parseInt(score[i]),
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         headers: {
                             "Authorization": "Bearer " + token
                         },
                         data: {
-                            //"groupId": groupId,
-                            //"studentId": studentId,
                             "topicId": topicId,
                             "grade": parseInt(score[i])
                         },

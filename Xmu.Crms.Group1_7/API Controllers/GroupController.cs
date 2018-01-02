@@ -41,7 +41,7 @@ namespace Xmu.Crms.Group1_7
         //按小组ID获取小组详情
         //GET:/group/{groupId}
         [HttpGet("api/group/{groupId}")]
-        public IActionResult GetGroupInfo(long groupId, Boolean embedTopics, Boolean embedGrade)
+        public IActionResult GetGroupInfo(long groupId)
         {
             try
             {
@@ -75,6 +75,35 @@ namespace Xmu.Crms.Group1_7
             //var data = new { id, leader, members, report, topics };
             //result.Data = data;
             //return result;
+        }
+
+        [HttpGet("api/group/{seminarId}/{studentId}")]
+        public IActionResult GetMyGroupInfo(long seminarId,long studentId)
+        {
+            try
+            {
+                var seminarGroup = _seminarGroupService.GetSeminarGroupById(seminarId,studentId);
+                return Json(new
+                {
+                    id = seminarGroup.Id,
+                   // seminarName = seminarGroup.Seminar.Name,
+                    //className = seminarGroup.ClassInfo.Name,
+                    //report = seminarGroup.Report,
+                   // reportGrade = seminarGroup.ReportGrade,
+                    //presentationGrade = seminarGroup.PresentationGrade,
+                   // finalGrade = seminarGroup.FinalGrade,
+                    leaderId = seminarGroup.LeaderId
+                });
+            }
+            catch (GroupNotFoundException)
+            {
+                return StatusCode(404,  "您未分组" );
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400,  "错误的Id格式" );
+            }
+
         }
 
         //组长辞职

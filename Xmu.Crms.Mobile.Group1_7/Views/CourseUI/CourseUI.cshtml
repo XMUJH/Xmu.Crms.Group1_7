@@ -59,7 +59,9 @@
                     // alert(array2[x]);
 
                     if (a.innerHTML == array[x].name) {
-                        window.localStorage.setItem('seminarID', array[x].id);
+                        window.localStorage.setItem("seminarID", array[x].id);
+                        window.localStorage.setItem("isFixed", array[x].groupingMethod);
+                        window.localStorage.setItem("seminarName", array[x].name);
                         break;
                     }
 

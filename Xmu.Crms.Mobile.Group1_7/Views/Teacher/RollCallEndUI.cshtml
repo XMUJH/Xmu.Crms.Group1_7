@@ -17,73 +17,94 @@
     <link rel="stylesheet" href="~/css/RollCallListUI.css">
     <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
     <script>
-        $(document).ready(function () {
+        var token = window.localStorage.getItem("jwt");
+        $(document).ready(function ()
+        {
             $.ajax({
                 type: "GET",
-                url: "/api/class/23",
+                url: "/api/class/" + window.localStorage.getItem("classID"),
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
                 success: function (result) {
-                    $("#className").text(result.Data.name);
+                    $("#className").text(result.name);
+                    $("#numStudent").text("学生总数:" + result.numStudent);
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/present",
+                        data: "",
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (result2) {
+                            $.ajax({
+                                type: "GET",
+                                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/late",
+                                data: "",
+                                contentType: "application/json; charset=utf-8",
+                                headers: { "Authorization": "Bearer " + token },
+                                dataType: "json",
+                                success: function (result3)
+                                {
+                                    var a = parseInt(result2.numPresent) + parseInt(result3.numLate);
+                                    $("#numPresent").append("已签到学生:" + a + "/" + result.numStudent);
+                                    $.each(result2.attendances, function (i, value)
+                                    {
+                                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                                        if (i % 2 == 0)
+                                            $("#presentStudents").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                        else
+                                            $("#presentStudents").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                    });
+                                    $.each(result3.attendances, function (i, value)
+                                    {
+                                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                                        if (i % 2 == 0)
+                                            $("#lateStudents").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                        else
+                                            $("#lateStudents").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                    });
+                                },
+                                error: function (data3)
+                                {
+                                    alert(data3.responseText);
+
+                                }
+                            })
+                        },
+                        error: function (data2) {
+                            alert(data2.responseText);
+
+                        }
+                    })
+                },
+                error: function (data) {
+                    alert(data.responseText);
+
                 }
             })
             $.ajax({
                 type: "GET",
-                url: "/api/seminar/52/class/32/attendance",
+                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/absent",
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
-                success: function (result) {
-                    $("#numPresent").append("签到学生：" + result.Data.numPresent + "/" + result.Data.numStudent);
-                }
-            })
-            $.ajax({
-                type: 'GET',
-                url: "/api/seminar/52/class/32/attendance/present",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $.each(result.Data, function (i, value) {
-                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
-                        if (i % 2 == 0)
-                            $("#presentStudents").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
-                        else
-                            $("#presentStudents").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
-                    });
-                }
-            })
-            $.ajax({
-                type: 'GET',
-                url: "/api/seminar/52/class/32/attendance/late",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $.each(result.Data, function (i, value) {
-                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
-                        if (i % 2 == 0)
-                            $("#lateStudents").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
-                        else
-                            $("#lateStudents").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
-                    });
-                }
-            })
-            $.ajax({
-                type: 'GET',
-                url: "/api/seminar/52/class/32/attendance/absent",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (result) {
-                    $.each(result.Data, function (i, value) {
+                success: function (result2)
+                {
+                    $.each(result2.attendances, function (i, value)
+                    {
                         var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
                         if (i % 2 == 0)
                             $("#absentStudents").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
                         else
                             $("#absentStudents").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
                     });
+                },
+                error: function (data2)
+                {
+                    alert(data2.responseText);
                 }
             })
         });

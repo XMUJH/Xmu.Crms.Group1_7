@@ -13,22 +13,12 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="~/css/RollStartCallUI.css">
+    <link rel="stylesheet" href="~/css/RollStartCallUI.css"/>
     <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
     <script>
         var token = window.localStorage.getItem("jwt");
         $(document).ready(function ()
         {
-            if (window.localStorage.getItem("groupingMethod") == "fixed")
-            {
-                with (document.getElementById("see1").style) { (display = "") };
-                with (document.getElementById("see2").style) { (display = "none") };
-            }
-            else
-            {
-                with (document.getElementById("see1").style) { (display = "none") };
-                with (document.getElementById("see2").style) { (display = "") };
-            }
             $.ajax({
                 type: "GET",
                 url: "/api/class/" + window.localStorage.getItem("classID"),
@@ -77,91 +67,51 @@
             })
         });
         //签到名单Button
-        $(document).on("click", ".blueCallBtn", function ()
+        $(document).on("click", ".blueBigBtn", function ()
         {
-            $(window).attr("location", "/Teacher/RollCallListUI"); 
-        });
-        //结束签到Button
-        $(document).on("click", ".redBigBtn", function ()
-        {
-            if (confirm("确定要结束签到吗?"))
-            {
-                $.ajax({
-                    type: "PUT",
-                    url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/endCall",
-                    data: "",
-                    contentType: "application/json; charset=utf-8",
-                    headers: { "Authorization": "Bearer " + token },
-                    dataType: "json",
-                    success: function (result) {
-                        $.ajax({
-                            type: "PUT",
-                            url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/finishAttendanceList",
-                            data: "",
-                            contentType: "application/json; charset=utf-8",
-                            headers: { "Authorization": "Bearer " + token },
-                            dataType: "json",
-                            success: function (result2)
-                            {
-                                $(window).attr("location", "/Teacher/EndRollCallUI");
-                            },
-                            error: function (data2) {
-                                alert(data2.responseText);
-
-                            }
-                        })
-                    },
-                    error: function (data) {
-                        alert(data.responseText);
-
-                    }
-                })
-            }
+            $(window).attr("location", "/Teacher/RollCallEndUI");   
         });
         //查看分组Button
         $(document).on("click", ".greenBigBtn", function ()
         {
-            $(window).attr("location", "/Teacher/FixedGroupInfoUI");   
-        });      
+            $(window).attr("location", "/Teacher/FIxedGroupInfoUI");
+        });
     </script>
-</head>
-<body>
+</head >
+            <body>
 
-    <!--设置左上角的蓝色板-->
+                <!--设置左上角的蓝色板-->
     <div class="blueBoardDiv">
-        <img src="~/images/themes/blueBoard.png" class='blueBoardIcon' />
-    </div>
+                    <img src="~/images/themes/blueBoard.png" class='blueBoardIcon' />
+                </div>
 
 
-    <!--班级1 的字样-->
+                <!--班级1 的字样-->
     <div class='classNameDiv' id="className"></div>
 
-    <!--学生总数：40 的字样-->
+                <!--学生总数：40 的字样-->
     <div class='studentSumDiv' id="numStudent"></div>
 
-    <!--细线，hr不好设置css，用一个高度很小的div来代替-->
+                <!--细线，hr不好设置css，用一个高度很小的div来代替-->
     <div class="hrDiv"></div>
 
+                <!--已签到的学生以及那个icon,当签到开始及结束时，这个
+    部分在中央。当签到开始后结束前，这部分在左边，见.studentNum2。-->
 
-    <!--已签到的学生+icon+签到名单，表示当签到开始后结束前的样子-->
-    <div class="studentNum2" id="numPresent">
-        <img src="~/images/themes/users.png" class="usersIcon2" />
+    <div class="studentNum" id="numPresent">
+                    <img src="~/images/themes/users.png" class="usersIcon" />
     </div>
-    <button type="button" class="blueCallBtn" id="callingList">签到名单</button>
 
-
-    <!--下面是button，分为BigBtn和SmallBnt,只有正在签到时
+                <!--下面是button，分为BigBtn和SmallBnt,只有正在签到时
     的 签到名单按钮 是SmallBnt。 当使用greyBigBtn的时候要加
     上提示语。-->
     <div>
-        <button type="button" class="redBigBtn"id="endCalling">结束签到</button>
-    </div>
+                    <button type="button" class="blueBigBtn" >签到名单</button>
+                </div>
 
-    <div>
-        <button type="button" class="greenBigBtn" id="see1">查看分组</button>
-        <button type="button" class="greyBigBtn" id="see2">查看分组</button>
-    </div>
+                <div>
+                    <button type="button" class="greenBigBtn">查看分组</button>
+                </div>
 
-</body>
-</html>
-
+            </body>
+</html >

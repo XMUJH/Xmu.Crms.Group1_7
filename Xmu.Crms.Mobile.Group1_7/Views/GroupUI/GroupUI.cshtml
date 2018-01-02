@@ -22,10 +22,11 @@
         var userIden = "leader";
         $(document).ready(function ()
         {
+            $(".seminarblackword").html(window.localStorage.getItem("seminarName") + "<br/>" + window.localStorage.getItem("isFixed"));
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/group/13?embedTopics=true&embedGrade=true",
+                    url: "/api/group/13",
                     data:"",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -92,16 +93,16 @@
                             var imgObj = " <img src=\"\\images\\GroupList\\user.png\"/>";
                             $("#members").append('<div class="block">' + '<div class="panel-body">' + '<div class="column1">' + imgObj + '</div>' + ' <div class="column2">' + value.name + "\n" + value.id + '</div>' + '</div>' + '</div>');
                         });
-                        if (window.localStorage.getItem("currentGM") == "fixed")
-                        {
-                            with (document.getElementById("groupingMethod1").style) { (display = "none") }
-                            with (document.getElementById("groupingMethod2").style) { (display = "") }
-                        }
-                        else
-                        {
-                            with (document.getElementById("groupingMethod1").style) { (display = "") }
-                            with (document.getElementById("groupingMethod2").style) { (display = "none") }
-                        }
+                        //if (window.localStorage.getItem("currentGM") == "fixed")
+                        //{
+                        //    with (document.getElementById("groupingMethod1").style) { (display = "none") }
+                        //    with (document.getElementById("groupingMethod2").style) { (display = "") }
+                        //}
+                        //else
+                        //{
+                        //    with (document.getElementById("groupingMethod1").style) { (display = "") }
+                        //    with (document.getElementById("groupingMethod2").style) { (display = "none") }
+                        //}
                     }
                 })
         })
@@ -154,8 +155,7 @@
 <body class="fullbackground">
     <div class="columndisplay">
         <img class="UsersIcon" src="~/images/GroupList/users.png"/>
-        <label class="seminarblackword" id="groupingMethod1">讨论课4<br/>随机分组</label>
-        <label class="seminarblackword" id="groupingMethod2">讨论课4<br/>固定分组</label>
+        <label class="seminarblackword" id="groupingMethod"></label>
     </div>
 
     <div class="whiteword">

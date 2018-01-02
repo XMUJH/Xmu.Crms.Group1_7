@@ -359,8 +359,8 @@ namespace Xmu.Crms.Services.HotPot
         {
             if (userId < 0)
                 throw new ArgumentException("UserID格式错误");
-            if (_db.UserInfo.Find(userId) == null)
-                throw new UserNotFoundException();
+            //if (_db.UserInfo.Find(userId) == null)
+            //    throw new UserNotFoundException();
             var classes = (from cs in _db.CourseSelection
                            where cs.Student.Id == userId
                            select cs.ClassInfo).ToList();

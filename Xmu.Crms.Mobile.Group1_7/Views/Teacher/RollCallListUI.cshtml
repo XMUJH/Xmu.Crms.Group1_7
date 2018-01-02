@@ -30,6 +30,7 @@
                 success: function (result)
                 {
                     $("#className").text(result.name);
+                    $("#numStudent").text("学生总数:" + result.numStudent);
                     $.ajax({
                         type: "GET",
                         url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/present",
@@ -39,27 +40,64 @@
                         dataType: "json",
                         success: function (result2)
                         {
-                            $("#numPresent").append("已签到学生：" + result2.numPresent + "/" + result.numStudent);
-                            $.each(result2.attendances, function (i, value)
-                            {
-                                var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
-                                if (i % 2 == 0)
-                                    $("#students").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
-                                else
-                                    $("#students").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                            $.ajax({
+                                type: "GET",
+                                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/late",
+                                data: "",
+                                contentType: "application/json; charset=utf-8",
+                                headers: { "Authorization": "Bearer " + token },
+                                dataType: "json",
+                                success: function (result3)
+                                {
+                                    var a = parseInt(result2.numPresent) + parseInt(result3.numLate);
+                                    var b = result2.attendances + result3.attendances;
+                                    $("#numPresent").append("已签到学生:" + a + "/" + result.numStudent);
+                                    $.each(result2.attendances, function (i, value)
+                                    {
+                                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                                        if (i % 2 == 0)
+                                            $("#students").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                        else
+                                            $("#students").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
 
-                            });
+                                    });
+                                    if (parseInt(result2.numPresent) % 2 == 0) {
+                                        $.each(result3.attendances, function (i, value) {
+                                            var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                                            if (i % 2 == 0)
+                                                $("#students").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                            else
+                                                $("#students").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+
+                                        });
+                                    }
+                                    else
+                                    {
+                                        $.each(result3.attendances, function (i, value) {
+                                            var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                                            if (i % 2 == 0)
+                                                $("#students").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                                            else
+                                                $("#students").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+
+                                        });
+                                    }
+                                },
+                                error: function (data3) {
+                                    alert(data3.responseText);
+
+                                }
+                            })
                         },
-                        error: function (data2)
-                        {
+                        error: function (data2) {
                             alert(data2.responseText);
 
                         }
                     })
                 },
-                error: function (data)
-                {
+                error: function (data) {
                     alert(data.responseText);
+
                 }
             })
         });

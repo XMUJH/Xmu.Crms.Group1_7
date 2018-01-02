@@ -12,7 +12,7 @@ using System.Linq;
 using Xmu.Crms.Shared.Exceptions;
 using System.Security.Claims;
 using static Xmu.Crms.Group1_7.Utils;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace Xmu.Crms.Group1_7
 {
@@ -67,6 +67,8 @@ namespace Xmu.Crms.Group1_7
             //result.Data = data;
             //return result;
         }
+
+
 
         //创建课程
         //POST:/course
@@ -210,6 +212,41 @@ namespace Xmu.Crms.Group1_7
             //return result;
         }
 
+        //按ID获取学生所在课程的班级列表
+        //GET:/course/{courseId}/class
+        [HttpGet("api/course/{courseId}/class/{studentId}")]
+        public IActionResult GetClassbyStudentId(int courseId,int studentId)
+        {
+            try
+            {
+                var classes = _classService.ListClassByCourseId(courseId);
+                var selections = _classService.ListClassByUserId(studentId);
+                //long classId = 0;
+                foreach (var Class in classes)
+                    foreach(var selection in selections)
+                    {
+                        if (selection.Id == Class.Id)
+                            return Json(selection.Id);
+                    }
+                return NoContent();
+            }
+            catch (CourseNotFoundException)
+            {
+                return StatusCode(404, "未找到课程" );
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400, "错误的ID格式" );
+            }
+
+            //JsonResult result = new JsonResult();
+            //var data = new object[] {
+            //    new { id = 45, name = "周三1-2节"},
+            //    new { id = 48, name = "周三3-4节"}
+            //};
+            //result.Data = data;
+            //return result;
+        }
         //在指定ID的课程创建班级
         //POST:/course/{courseId}/class
         [HttpPost("api/course/{courseId}/class")]

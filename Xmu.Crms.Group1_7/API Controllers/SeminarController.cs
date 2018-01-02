@@ -372,20 +372,27 @@ namespace Xmu.Crms.Group1_7
                 {
                     usersId.Add(x.Id);
                 }
-                Attendance tool = new Attendance();
-                foreach(long x in usersId)
+                // Attendance tool = new Attendance();
+                IList<Attendance> tool = new List<Attendance>();
+                Attendance tool1;
+                foreach (long x in usersId)
                 {
                     if(usersId2.Contains(x)==false)
                     {
-                        tool.ClassId = classId;
-                        tool.SeminarId = seminarId;
-                        tool.StudentId = x;
-                        tool.AttendanceStatus = AttendanceStatus.Absent;
-                        _db.Attendences.Add(tool);
+                        tool1 = new Attendance();
+                        tool1.ClassId = classId;
+                        tool1.SeminarId = seminarId;
+                        tool1.StudentId = x;
+                        tool1.AttendanceStatus = AttendanceStatus.Absent;
+                        tool.Add(tool1);
                     }
                 }
+                 for (int i = 0; i < tool.Count; i++)
+                {
+                    _db.Attendences.Add(tool[i]);
+                }
                 _db.SaveChanges();
-                return NoContent();
+                return NoContent(); 
             }
             catch (ClassNotFoundException e)
             {
@@ -444,6 +451,7 @@ namespace Xmu.Crms.Group1_7
                 IList<UserInfo> attendances = _userService.ListLateStudent(seminarId, classId);
                 var result = new
                 {
+                    numLate=attendances.Count,
                     attendances
                 };
                 return Json(result);
@@ -474,6 +482,7 @@ namespace Xmu.Crms.Group1_7
                 IList<UserInfo> attendances = _userService.ListAbsenceStudent(seminarId, classId);
                 var result = new
                 {
+                    numAbsent = attendances.Count,
                     attendances
                 };
                 return Json(result);

@@ -38,7 +38,7 @@
                 dataType: "json",
                 success: function (result) {
                     $("#className").text(result.name);
-                    $("#numStudent").text("学生总数：" + result.numStudent);
+                    $("#numStudent").text("学生总数:" + result.numStudent);
                     $.ajax({
                         type: "GET",
                         url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/present",
@@ -47,7 +47,22 @@
                         headers: { "Authorization": "Bearer " + token },
                         dataType: "json",
                         success: function (result2) {
-                            $("#numPresent").append("已签到学生：" + result2.numPresent + "/" + result.numStudent);
+                            $.ajax({
+                                type: "GET",
+                                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/late",
+                                data: "",
+                                contentType: "application/json; charset=utf-8",
+                                headers: { "Authorization": "Bearer " + token },
+                                dataType: "json",
+                                success: function (result3) {
+                                    var a = parseInt(result2.numPresent) + parseInt(result3.numLate);
+                                    $("#numPresent").append("已签到学生:" + a + "/" + result.numStudent);
+                                },
+                                error: function (data3) {
+                                    alert(data3.responseText);
+
+                                }
+                            })
                         },
                         error: function (data2) {
                             alert(data2.responseText);
@@ -69,39 +84,39 @@
         //结束签到Button
         $(document).on("click", ".redBigBtn", function ()
         {
-            $.ajax({
-                type: "PUT",
-                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/endCall",
-                data: "",
-                contentType: "application/json; charset=utf-8",
-                headers: { "Authorization": "Bearer " + token },
-                dataType: "json",
-                success: function (result)
-                {
-                    $.ajax({
-                        type: "PUT",
-                        url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/finishAttendanceList",
-                        data: "",
-                        contentType: "application/json; charset=utf-8",
-                        headers: { "Authorization": "Bearer " + token },
-                        dataType: "json",
-                        success: function (result2)
-                        {
-                            $(window).attr("location", "/Teacher/EndRollCallUI");
-                        },
-                        error: function (data2)
-                        {
-                            alert(data2.responseText);
+            if (confirm("确定要结束签到吗?"))
+            {
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/endCall",
+                    data: "",
+                    contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
+                    dataType: "json",
+                    success: function (result) {
+                        $.ajax({
+                            type: "PUT",
+                            url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/finishAttendanceList",
+                            data: "",
+                            contentType: "application/json; charset=utf-8",
+                            headers: { "Authorization": "Bearer " + token },
+                            dataType: "json",
+                            success: function (result2)
+                            {
+                                $(window).attr("location", "/Teacher/EndRollCallUI");
+                            },
+                            error: function (data2) {
+                                alert(data2.responseText);
 
-                        }
-                    })
-                },
-                error: function (data)
-                {
-                    alert(data.responseText);
+                            }
+                        })
+                    },
+                    error: function (data) {
+                        alert(data.responseText);
 
-                }
-            })  
+                    }
+                })
+            }
         });
         //查看分组Button
         $(document).on("click", ".greenBigBtn", function ()

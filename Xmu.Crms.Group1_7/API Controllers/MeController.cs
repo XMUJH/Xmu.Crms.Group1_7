@@ -44,7 +44,7 @@ namespace Xmu.Crms.Group1_7
         [Route("/")]
         public IActionResult HomePage()
         {
-            return Redirect("/SeminarUI/Seminar");
+            return Redirect("/GroupUI/GroupUI");
         }
 
         //获取当前用户

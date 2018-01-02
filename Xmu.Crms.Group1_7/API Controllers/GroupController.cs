@@ -12,6 +12,7 @@ using System.Linq;
 using Xmu.Crms.Shared.Exceptions;
 using System.Security.Claims;
 using static Xmu.Crms.Group1_7.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace Xmu.Crms.Group1_7
 {
@@ -23,11 +24,13 @@ namespace Xmu.Crms.Group1_7
         private CrmsContext _db;
         ISeminarGroupService _seminarGroupService;
         IFixGroupService _fixGroupService;
+        ITopicService _topicService;
         IGradeService _gradeService;
 
-        public GroupController(CrmsContext db,ISeminarGroupService seminarGroupService,IFixGroupService fixGroupService,IGradeService gradeService)
+        public GroupController(CrmsContext db,ITopicService topicService, ISeminarGroupService seminarGroupService,IFixGroupService fixGroupService,IGradeService gradeService)
         {
             _db = db;
+            _topicService = topicService;
             _seminarGroupService = seminarGroupService;
             _fixGroupService = fixGroupService;
             _gradeService = gradeService;
@@ -40,16 +43,38 @@ namespace Xmu.Crms.Group1_7
         {
             try
             {
-                var seminarGroup = _seminarGroupService.GetSeminarGroupByGroupId(groupId);
+                //var seminarGroup = _seminarGroupService.GetSeminarGroupByGroupId(groupId);
+               var seminarGroup = _db.SeminarGroup
+                    //包含Seminar
+                    .Include(x => x.Seminar)
+                    //包含Class
+                    .Include(x => x.ClassInfo)
+                    //包含Leader
+                    // .Include(x => x.Leader)
+                    //取出小组
+                    .Single(x => x.Id == groupId);
+                var seminarGroupmembers = _seminarGroupService.ListSeminarGroupMemberByGroupId(groupId);
+                var seminarGroupTopics = _topicService.ListSeminarGroupTopicByGroupId(groupId);
+                //foreach(var topic in seminarGroupTopics)
+                //{
+                //    topic.SeminarGroup = null;
+                //}
+                //_db.SaveChanges();
+                //var a = seminarGroupTopics[0].Id;
+                //var b = seminarGroupTopics[0].TopicId;
+                //var c = seminarGroupTopics[0].Topic.Name;
+                // var d = seminarGroup.Leader;
                 return Json(new {
                     id = seminarGroup.Id,
                     seminarName = seminarGroup.Seminar.Name,
                     className = seminarGroup.ClassInfo.Name,
+                    topics = seminarGroupTopics,
+                    members = seminarGroupmembers,
                     report = seminarGroup.Report,
                     reportGrade = seminarGroup.ReportGrade,
                     presentationGrade = seminarGroup.PresentationGrade,
                     finalGrade = seminarGroup.FinalGrade,
-                    leaderName = seminarGroup.Leader.Name
+                    leader = seminarGroup.Leader
                 });
             }
             catch(GroupNotFoundException)
@@ -104,11 +129,13 @@ namespace Xmu.Crms.Group1_7
         //组长辞职
         //PUT:/group/{groupId}/resign
         [HttpPut("api/group/{groupId}/resign")]
-        public IActionResult LeaderResign(long groupId, long id)
+        public IActionResult LeaderResign(long groupId)
         {
             try
             {
-                _seminarGroupService.ResignLeaderById(groupId, id);
+                var group = _db.SeminarGroup.Find(groupId);
+                group.LeaderId = 0;
+                _db.SaveChanges();
             }
             catch(UserNotFoundException)
             {
@@ -135,11 +162,14 @@ namespace Xmu.Crms.Group1_7
         //成为组长
         //PUT:/group/{groupId}/assign
         [HttpPut("api/group/{groupId}/assign")]
-        public IActionResult BecomeLeader(long groupId, long id)
+        public IActionResult BecomeLeader(long groupId)
         {
             try
             {
-                _seminarGroupService.AssignLeaderById(groupId, id);
+                //_seminarGroupService.AssignLeaderById(groupId, id);
+                var group = _db.SeminarGroup.Find(groupId);
+                group.LeaderId = User.Id();
+                _db.SaveChanges();
             }
             catch (UserNotFoundException)
             {

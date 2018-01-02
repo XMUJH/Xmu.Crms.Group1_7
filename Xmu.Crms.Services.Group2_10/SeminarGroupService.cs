@@ -387,23 +387,22 @@ namespace Xmu.Crms.Services.Group2_10
             if (groupId <= 0) throw new System.ArgumentException("id格式错误");
 
             //找到小组
-            try
-            {
+            
                 group = _db.SeminarGroup
                     //包含Seminar
                     .Include(x => x.Seminar)
                     //包含Class
                     .Include(x => x.ClassInfo)
                     //包含Leader
-                    .Include(x => x.Leader)
+                   // .Include(x => x.Leader)
                     //取出小组
                     .Single(x => x.Id == groupId);
-            }
-            catch(Exception e)
+            
+            //catch(Exception e)
 
-            {
-                throw new GroupNotFoundException();
-            }
+            //{
+            //    throw new GroupNotFoundException();
+            //}
 
             return group;
         }

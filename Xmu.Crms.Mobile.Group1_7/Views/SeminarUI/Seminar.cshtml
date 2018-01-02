@@ -97,8 +97,10 @@
         })
         $(document).on("click", ".CallBox", function ()
         {
-            // $(window).attr("location", '/Student/StudentRollCallUI');
-            window.location.href = "/Student/StudentRollCallUI";
+            if (window.localStorage.getItem("isCalled") == 1)
+                alert("已成功签到");
+            else
+                window.location.href = "/Student/StudentRollCallUI";
         })
         $(document).on("click", ".ScoreBox", function ()
         {

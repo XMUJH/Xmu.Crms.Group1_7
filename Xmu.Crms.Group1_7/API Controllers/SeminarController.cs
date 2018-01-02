@@ -73,15 +73,15 @@ namespace Xmu.Crms.Group1_7
         {
             try
             {
-                var att = _db.Attendences.SingleOrDefault(c => c.ClassId == classId && c.SeminarId == seminarId && c.StudentId == User.Id());
-                string atten;
-                if (att == null)
-                    atten = "no";
-                else
-                    atten = att.AttendanceStatus.ToString();
+                //var att = _db.Attendences.SingleOrDefault(c => c.ClassId == classId && c.SeminarId == seminarId && c.StudentId == User.Id());
+                //string atten;
+                //if (att == null)
+                    //atten = "no";
+               // else
+                   // atten = att.AttendanceStatus.ToString();
                 return Json(new
                 {
-                    attendance = atten,
+                   // attendance = atten,
                     statu = _db.Location.SingleOrDefault(c => c.ClassInfoId == classId && c.SeminarId == seminarId).Status
                 });
             }

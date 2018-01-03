@@ -27,6 +27,7 @@
                 dataType: "json",
                 success: function (result) {
                     $.each(result, function (ii, value) {
+
                         $.ajax({
                             type: "GET",
                             url: "/api/seminar/group/" + value.id + "/groupTopic",
@@ -43,40 +44,46 @@
                                     headers: { "Authorization": "Bearer " + token },
                                     dataType: "json",
                                     success: function (result3) {
-                                        $.each(result2, function (aa, topics) {
+                                        $.each(result2, function (aa, topics)
+                                        {
                                             $("#groups").append(
                                                 '<div onclick="showMembers(' + value.id + ')" class=\"studentListBarDiv\">' +
                                                 '<span class=\"groupName\">' + "队伍" + ii + '</span>' +
                                                 '<span class=\"groupTopics\">选题:' + topics.topic.name + '</span>' + '</div >');
-                                            return false;
-                                        });
-                                        var left = true;
-                                        $("#groups").append('<div id=\"members_' + value.id + '\"hidden/>');
-                                        $.each(result3, function (i, member) {
+                                            var left = true;
+                                            $("#groups").append('<div id=\"members_' + value.id + '\"hidden/>');
+                                            $.each(result3, function (i, member)
+                                            {
+                                                if (left == true)
+                                                {
+                                                    $("#members_" + value.id).append('<div class=\'studentLeftBlock\'>' +
+                                                        '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                                        '<span class=\"studentName\">' + member.name + '</span></div>');
+                                                    left = false;
+                                                }
+                                                else {
+                                                    $("#members_" + value.id).append('<div class=\'studentRightBlock\'>' +
+                                                        '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                                        '<span class=\"studentName\">' + member.name + '</span></div>');
+                                                    left = true;
+                                                }
+
+                                            });
                                             if (left == true) {
                                                 $("#members_" + value.id).append('<div class=\'studentLeftBlock\'>' +
-                                                    '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
-                                                    '<span class=\"studentName\">' + member.name + '</span></div>');
+                                                    '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\' onclick=\"addStu()\"/>');
                                                 left = false;
                                             }
                                             else {
                                                 $("#members_" + value.id).append('<div class=\'studentRightBlock\'>' +
-                                                    '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
-                                                    '<span class=\"studentName\">' + member.name + '</span></div>');
+                                                    '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\' onclick=\"addStu()\"/>');
                                                 left = true;
                                             }
-                                        })
+                                            return false;
+                                        });
+                                     
                                         //空白添加学生的块
-                                        if (left == true) {
-                                            $("#members_" + value.id).append('<div class=\'studentLeftBlock\'>' +
-                                                '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\' onclick=\"addStu()\"/>');
-                                            left = false;
-                                        }
-                                        else {
-                                            $("#members_" + value.id).append('<div class=\'studentRightBlock\'>' +
-                                                '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\' onclick=\"addStu()\"/>');
-                                            left = true;
-                                        }
+ 
                                     },
                                     error: function (data3) {
                                         alert(data3.responseText);

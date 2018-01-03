@@ -70,70 +70,70 @@ namespace Xmu.Crms.Group1_7
             }
         }
 
-        [HttpGet("api/seminar/{seminarId}/class/{classId}/group")]
-        public IActionResult GetGroupsBySeminarId(long seminarId, long classId)
-        {
-            try
-            {
-                IList<SeminarGroup> rawGroups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
-                SeminarGroup tool;
-                IList<SeminarGroup> groups = new List<SeminarGroup>();
-                foreach (SeminarGroup x in rawGroups)
-                {
-                    if (x.ClassId == classId)
-                    {
-                        tool = new SeminarGroup();
-                        tool = x;
-                        groups.Add(tool);
-                    }
-                }
-                return Json(groups);
-            }
-            catch (SeminarNotFoundException e)
-            {
-                return StatusCode(404, e.GetAlertInfo());
-            }
-            catch (ArgumentException)
-            {
-                return StatusCode(400, "讨论课ID输入格式有误");
-            }
-        }
+        //[HttpGet("api/seminar/{seminarId}/class/{classId}/group")]
+        //public IActionResult GetGroupsBySeminarId(long seminarId, long classId)
+        //{
+        //    try
+        //    {
+        //        IList<SeminarGroup> rawGroups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
+        //        SeminarGroup tool;
+        //        IList<SeminarGroup> groups = new List<SeminarGroup>();
+        //        foreach (SeminarGroup x in rawGroups)
+        //        {
+        //            if (x.ClassId == classId)
+        //            {
+        //                tool = new SeminarGroup();
+        //                tool = x;
+        //                groups.Add(tool);
+        //            }
+        //        }
+        //        return Json(groups);
+        //    }
+        //    catch (SeminarNotFoundException e)
+        //    {
+        //        return StatusCode(404, e.GetAlertInfo());
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, "讨论课ID输入格式有误");
+        //    }
+        //}
 
-        [HttpGet("api/seminar/group/{groupId}/groupTopic")]
-        public IActionResult GetTopicByGroupId(long groupId)
-        {
-            try
-            {
-                IList<SeminarGroupTopic> topics = _topicService.ListSeminarGroupTopicByGroupId(groupId);
-                return Json(topics);
-            }
-            catch (GroupNotFoundException e)
-            {
-                return StatusCode(404, e.GetAlertInfo());
-            }
-            catch (ArgumentException)
-            {
-                return StatusCode(400, "ID输入格式有误");
-            }
-        }
+        //[HttpGet("api/seminar/group/{groupId}/groupTopic")]
+        //public IActionResult GetTopicByGroupId(long groupId)
+        //{
+        //    try
+        //    {
+        //        IList<SeminarGroupTopic> topics = _topicService.ListSeminarGroupTopicByGroupId(groupId);
+        //        return Json(topics);
+        //    }
+        //    catch (GroupNotFoundException e)
+        //    {
+        //        return StatusCode(404, e.GetAlertInfo());
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, "ID输入格式有误");
+        //    }
+        //}
 
-        [HttpGet("api/seminar/group/{groupId}/groupMember")]
-        public IActionResult GetMemberByGroupId(long groupId)
-        {
-            try
-            {
-                IList<UserInfo> members = _seminargroupService.ListSeminarGroupMemberByGroupId(groupId);
-                return Json(members);
-            }
-            catch (GroupNotFoundException e)
-            {
-                return StatusCode(404, e.GetAlertInfo());
-            }
-            catch (ArgumentException)
-            {
-                return StatusCode(400, "ID输入格式有误");
-            }
-        }
+        //[HttpGet("api/seminar/group/{groupId}/groupMember")]
+        //public IActionResult GetMemberByGroupId(long groupId)
+        //{
+        //    try
+        //    {
+        //        IList<UserInfo> members = _seminargroupService.ListSeminarGroupMemberByGroupId(groupId);
+        //        return Json(members);
+        //    }
+        //    catch (GroupNotFoundException e)
+        //    {
+        //        return StatusCode(404, e.GetAlertInfo());
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, "ID输入格式有误");
+        //    }
+        //}
 
         [HttpGet("api/seminar/{seminarId:long}/group/my")]
         public IActionResult GetStudentGroupBySeminarId([FromRoute] long seminarId)

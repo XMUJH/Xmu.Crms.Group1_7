@@ -28,7 +28,6 @@ namespace Xmu.Crms.Group1_7
         IGradeService _gradeService;
         ICourseService _courseService;
         IClassService _classService;
-        ITopicService _topicService;
         public GroupController(CrmsContext db,ISeminarGroupService seminarGroupService,IFixGroupService fixGroupService,IGradeService gradeService, ICourseService courseService, IClassService classService, ITopicService topicService)
         {
             _db = db;

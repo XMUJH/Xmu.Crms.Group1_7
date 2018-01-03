@@ -186,7 +186,6 @@ namespace Xmu.Crms.Services.Group2_10
             //由于topicList只可能有一个元素，故直接返回该元素
             return topicList[0];
         }
-
         /// <summary>
         /// 根据讨论课Id和topic信息创建一个话题.
         /// </summary>

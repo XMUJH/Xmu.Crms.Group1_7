@@ -116,7 +116,8 @@
         //查看分组
         $(document).on("click", ".greenBigBtn", function ()
         {
-            $(window).attr("location", "/Teacher/FixedGroupInfoUI");
+            if (window.localStorage.getItem("groupingMethod") == "fixed") $(window).attr("location", "/Teacher/FIxedGroupInfoUI");
+            else $(window).attr("location", "/Teacher/RandomGroupInfoUI");
         });
     </script>
 </head>

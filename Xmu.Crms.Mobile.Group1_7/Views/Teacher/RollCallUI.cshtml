@@ -54,7 +54,8 @@
                                 contentType: "application/json; charset=utf-8",
                                 headers: { "Authorization": "Bearer " + token },
                                 dataType: "json",
-                                success: function (result3) {
+                                success: function (result3)
+                                {
                                     var a = parseInt(result2.numPresent) + parseInt(result3.numLate);
                                     $("#numPresent").append("已签到学生:" + a + "/" + result.numStudent);
                                 },
@@ -93,10 +94,11 @@
                     contentType: "application/json; charset=utf-8",
                     headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
-                    success: function (result) {
-                        $.ajax({
+                    success: function (result)
+                    {
+                       $.ajax({
                             type: "PUT",
-                            url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/finishAttendanceList",
+                            url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/autoGroup",
                             data: "",
                             contentType: "application/json; charset=utf-8",
                             headers: { "Authorization": "Bearer " + token },
@@ -105,7 +107,8 @@
                             {
                                 $(window).attr("location", "/Teacher/EndRollCallUI");
                             },
-                            error: function (data2) {
+                            error: function (data2)
+                            {
                                 alert(data2.responseText);
 
                             }
@@ -121,7 +124,8 @@
         //查看分组Button
         $(document).on("click", ".greenBigBtn", function ()
         {
-            $(window).attr("location", "/Teacher/FixedGroupInfoUI");   
+            if (window.localStorage.getItem("groupingMethod") == "fixed") $(window).attr("location", "/Teacher/FIxedGroupInfoUI");
+            else $(window).attr("location", "/Teacher/RandomGroupInfoUI");
         });      
     </script>
 </head>

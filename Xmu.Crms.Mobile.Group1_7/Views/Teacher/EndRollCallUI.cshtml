@@ -69,12 +69,13 @@
         //签到名单Button
         $(document).on("click", ".blueBigBtn", function ()
         {
-            $(window).attr("location", "/Teacher/RollCallEndUI");   
+            $(window).attr("location", "/Teacher/RollCallListUI");   
         });
         //查看分组Button
         $(document).on("click", ".greenBigBtn", function ()
         {
-            $(window).attr("location", "/Teacher/FIxedGroupInfoUI");
+            if (window.localStorage.getItem("groupingMethod") == "fixed") $(window).attr("location", "/Teacher/FIxedGroupInfoUI");
+            else $(window).attr("location", "/Teacher/RandomGroupInfoUI");
         });
     </script>
 </head >

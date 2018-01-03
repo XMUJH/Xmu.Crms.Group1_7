@@ -72,13 +72,32 @@
 
                     if (a.innerHTML == array2[x])
                     {
-                        window.localStorage.setItem('courseID', array1[x]);
-                        window.localStorage.setItem('courseName', array2[x]);
+                        var ClassId;
+                        var token = window.localStorage.getItem("jwt");
+                        $.ajax({
+                            type: 'GET',
+                            url: "/api/course/" + array1[x] + "/class/" + window.localStorage.getItem("id"),
+                            data: "",
+                            contentType: "application/json; charset=utf-8",
+                            headers: { "Authorization": "Bearer " + token },
+                            dataType: "json",
+                            success: function (data) {
+                                ClassId = data;
+                                window.localStorage.setItem('classID', ClassId);
+                                window.localStorage.setItem('courseID', array1[x]);
+                                window.localStorage.setItem('courseName', array2[x]);
+                                $(window).attr("location", '/CourseUI/CourseUI');
+                            },
+                            error: function (data) {
+                                alert("212");
+                            }
+                        })
+
                         break;
                     }
 
                 }
-                $(window).attr("location", '/CourseUI/CourseUI');
+                
             });
         });
     </script>

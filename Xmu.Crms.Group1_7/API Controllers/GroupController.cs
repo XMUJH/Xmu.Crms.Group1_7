@@ -12,6 +12,7 @@ using System.Linq;
 using Xmu.Crms.Shared.Exceptions;
 using System.Security.Claims;
 using static Xmu.Crms.Group1_7.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace Xmu.Crms.Group1_7
 {
@@ -23,33 +24,62 @@ namespace Xmu.Crms.Group1_7
         private CrmsContext _db;
         ISeminarGroupService _seminarGroupService;
         IFixGroupService _fixGroupService;
+        ITopicService _topicService;
         IGradeService _gradeService;
-
-        public GroupController(CrmsContext db,ISeminarGroupService seminarGroupService,IFixGroupService fixGroupService,IGradeService gradeService)
+        ICourseService _courseService;
+        IClassService _classService;
+        ITopicService _topicService;
+        public GroupController(CrmsContext db,ISeminarGroupService seminarGroupService,IFixGroupService fixGroupService,IGradeService gradeService, ICourseService courseService, IClassService classService, ITopicService topicService)
         {
             _db = db;
+            _topicService = topicService;
             _seminarGroupService = seminarGroupService;
             _fixGroupService = fixGroupService;
             _gradeService = gradeService;
+            _courseService = courseService;
+            _classService = classService;
+            _topicService = topicService;
         }
         
         //按小组ID获取小组详情
         //GET:/group/{groupId}
         [HttpGet("api/group/{groupId}")]
-        public IActionResult GetGroupInfo(long groupId, Boolean embedTopics, Boolean embedGrade)
+        public IActionResult GetGroupInfo(long groupId)
         {
             try
             {
-                var seminarGroup = _seminarGroupService.GetSeminarGroupByGroupId(groupId);
+                //var seminarGroup = _seminarGroupService.GetSeminarGroupByGroupId(groupId);
+               var seminarGroup = _db.SeminarGroup
+                    //包含Seminar
+                    .Include(x => x.Seminar)
+                    //包含Class
+                    .Include(x => x.ClassInfo)
+                    //包含Leader
+                    // .Include(x => x.Leader)
+                    //取出小组
+                    .Single(x => x.Id == groupId);
+                var seminarGroupmembers = _seminarGroupService.ListSeminarGroupMemberByGroupId(groupId);
+                var seminarGroupTopics = _topicService.ListSeminarGroupTopicByGroupId(groupId);
+                //foreach(var topic in seminarGroupTopics)
+                //{
+                //    topic.SeminarGroup = null;
+                //}
+                //_db.SaveChanges();
+                //var a = seminarGroupTopics[0].Id;
+                //var b = seminarGroupTopics[0].TopicId;
+                //var c = seminarGroupTopics[0].Topic.Name;
+                // var d = seminarGroup.Leader;
                 return Json(new {
                     id = seminarGroup.Id,
                     seminarName = seminarGroup.Seminar.Name,
                     className = seminarGroup.ClassInfo.Name,
+                    topics = seminarGroupTopics,
+                    members = seminarGroupmembers,
                     report = seminarGroup.Report,
                     reportGrade = seminarGroup.ReportGrade,
                     presentationGrade = seminarGroup.PresentationGrade,
                     finalGrade = seminarGroup.FinalGrade,
-                    leaderName = seminarGroup.Leader.Name
+                    leader = seminarGroup.Leader
                 });
             }
             catch(GroupNotFoundException)
@@ -72,14 +102,45 @@ namespace Xmu.Crms.Group1_7
             //return result;
         }
 
-        //组长辞职
-        //PUT:/group/{groupId}/resign
-        [HttpPut("api/group/{groupId}/resign")]
-        public IActionResult LeaderResign(long groupId, long id)
+        [HttpGet("api/group/{seminarId}/{studentId}")]
+        public IActionResult GetMyGroupInfo(long seminarId,long studentId)
         {
             try
             {
-                _seminarGroupService.ResignLeaderById(groupId, id);
+                var seminarGroup = _seminarGroupService.GetSeminarGroupById(seminarId,studentId);
+                return Json(new
+                {
+                    id = seminarGroup.Id,
+                   // seminarName = seminarGroup.Seminar.Name,
+                    //className = seminarGroup.ClassInfo.Name,
+                    //report = seminarGroup.Report,
+                   // reportGrade = seminarGroup.ReportGrade,
+                    //presentationGrade = seminarGroup.PresentationGrade,
+                   // finalGrade = seminarGroup.FinalGrade,
+                    leaderId = seminarGroup.LeaderId
+                });
+            }
+            catch (GroupNotFoundException)
+            {
+                return StatusCode(404,  "您未分组" );
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400,  "错误的Id格式" );
+            }
+
+        }
+
+        //组长辞职
+        //PUT:/group/{groupId}/resign
+        [HttpPut("api/group/{groupId}/resign")]
+        public IActionResult LeaderResign(long groupId)
+        {
+            try
+            {
+                var group = _db.SeminarGroup.Find(groupId);
+                group.LeaderId = 0;
+                _db.SaveChanges();
             }
             catch(UserNotFoundException)
             {
@@ -106,11 +167,14 @@ namespace Xmu.Crms.Group1_7
         //成为组长
         //PUT:/group/{groupId}/assign
         [HttpPut("api/group/{groupId}/assign")]
-        public IActionResult BecomeLeader(long groupId, long id)
+        public IActionResult BecomeLeader(long groupId)
         {
             try
             {
-                _seminarGroupService.AssignLeaderById(groupId, id);
+                //_seminarGroupService.AssignLeaderById(groupId, id);
+                var group = _db.SeminarGroup.Find(groupId);
+                group.LeaderId = User.Id();
+                _db.SaveChanges();
             }
             catch (UserNotFoundException)
             {
@@ -314,22 +378,49 @@ namespace Xmu.Crms.Group1_7
             //response.Content = new StringContent("成功", Encoding.UTF8);
             //return response;
         }
-
         //提交对其他小组的打分
         //PUT:/group/{groupId}/grade/presentation/{studentId}
         //[FromBody]dynamic presentation
-        [HttpPut("api/group/{groupId}/grade/presentation/{studentId}")]
-        public IActionResult SubmitPresentationGrade(long groupId, long studentId,long topicId,int grade)
+        //[HttpPut("api/group/{groupId}/grade/presentation/{studentId}")]
+        //public IActionResult SubmitPresentationGrade(long groupId, long studentId, long topicId, int grade)
+        //{
+        //    try
+        //    {
+        //        _gradeService.InsertGroupGradeByUserId(topicId, studentId, groupId, grade);
+        //    }
+        //    catch (GroupNotFoundException)
+        //    {
+        //        return StatusCode(404, new { msg = "未找到小组" });
+        //    }
+        //    catch (Xmu.Crms.Shared.Exceptions.InvalidOperationException)
+        //    {
+        //        return StatusCode(409, new { msg = "已评分，不能重复评分" });
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, new { msg = "错误的Id格式" });
+        //    }
+        //    return NoContent();
+        //    //HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.NoContent);
+        //    //response.Content = new StringContent("成功",Encoding.UTF8);
+        //    //return response;
+        //}
+        //提交对其他小组的打分
+        //PUT:/group/{groupId}/grade/presentation/{studentId}
+        //[FromBody]dynamic presentation
+        [HttpPut("api/group/{groupId}/grade/presentation/{topicId}/{grade}")]
+        public IActionResult SubmitPresentationGrade([FromRoute]long groupId, long topicId, int grade)
         {
             try
             {
-                _gradeService.InsertGroupGradeByUserId(topicId, studentId, groupId,grade);
-            }    
+                //if(groupId)
+                _gradeService.InsertGroupGradeByUserId(topicId, User.Id(), groupId, grade);
+            }
             catch (GroupNotFoundException)
             {
                 return StatusCode(404, new { msg = "未找到小组" });
             }
-            catch(Xmu.Crms.Shared.Exceptions.InvalidOperationException)
+            catch (Xmu.Crms.Shared.Exceptions.InvalidOperationException)
             {
                 return StatusCode(409, new { msg = "已评分，不能重复评分" });
             }
@@ -342,5 +433,57 @@ namespace Xmu.Crms.Group1_7
             //response.Content = new StringContent("成功",Encoding.UTF8);
             //return response;
         }
+
+
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[HttpPut("api/group/{id}/grade/presentation")]
+        //public IActionResult PostGrade(long id, [FromQuery]long topicId, [FromQuery]int grade)
+        //{
+        //    try
+        //    {
+        //        var userId = User.Id();
+        //        _gradeService.InsertGroupGradeByUserId(topicId, userId, id, grade);
+        //        return Json(new { status = 200 });
+        //    }
+        //    catch (GroupNotFoundException)
+        //    {
+        //        return StatusCode(404, new { msg = "没有找到该课程" });
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, new { msg = "组号格式错误" });
+        //    }
+
+        //}
+
+        //[HttpPut("api/group/{groupId:long}/grade/presentation/{studentId:long}")]
+        //public IActionResult SubmitStudentGradeByGroupId([FromBody] long groupId, [FromBody] long studentId,
+        //   [FromBody] StudentScoreGroup updated)
+        //{
+        //    try
+        //    {
+        //        if (User.Type() != Shared.Models.Type.Student)
+        //        {
+        //            return StatusCode(403, new { msg = "权限不足" });
+        //        }
+
+        //        if (updated.Grade == null)
+        //        {
+        //            return NoContent();
+        //        }
+
+        //        _gradeService.InsertGroupGradeByUserId(updated.SeminarGroupTopic.Topic.Id, updated.Student.Id,
+        //            groupId, (int)updated.Grade);
+        //        return NoContent();
+        //    }
+        //    catch (GroupNotFoundException)
+        //    {
+        //        return StatusCode(404, new { msg = "没有找到该课程" });
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, new { msg = "组号格式错误" });
+        //    }
+        //}
     }
 }

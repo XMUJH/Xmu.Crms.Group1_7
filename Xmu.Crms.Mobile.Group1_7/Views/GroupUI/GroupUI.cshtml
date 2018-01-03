@@ -22,28 +22,36 @@
         var userIden = "leader";
         $(document).ready(function ()
         {
+            $(".seminarblackword").html(window.localStorage.getItem("seminarName") + "<br/>" + window.localStorage.getItem("isFixed"));
+            var token = window.localStorage.getItem("jwt");
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/group/13?embedTopics=true&embedGrade=true",
+                    url: "/api/group/" + window.localStorage.getItem("groupID"),
                     data:"",
                     contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result)
                     {
-                        if (result.Data.leader.id != "")
+                        //如果有组长的前提下
+                        if (result.leader != null)
                         {
+                            //显示出组长标志
                             with (document.getElementById("leaderIcon").style) { (display = "") }
+                            with (document.getElementById("captain").style) { (display = "") }
                             with (document.getElementById("becomeLeader").style) { (display = "none") }
                             with (document.getElementById("hit").style) { (display = "none") }
-                            $.each(result.Data.members, function (i, value)
-                            {
-                                if (value.id == "24320152202746") userIden = "member";
-                            });
+                            //判断自己是否为组长
+                            if (result.leader.id == window.localStorage.getItem("id"))
+                                userIden = "leader";
+                            else
+                                userIden = "member";
+                            //自己为组长的前提下，对辞职和选择话题显示的判断
                             if (userIden == "leader")
                             {
                                 with (document.getElementById("resign").style) { (display = "") }
-                                if (result.Data.topics.id == "")
+                                if (result.topics[0] == null)
                                 {
                                     with (document.getElementById("topic").style) { (display = "none") }
                                     with (document.getElementById("chooseTopic").style) { (display = "") }
@@ -52,12 +60,14 @@
                                 {
                                     with (document.getElementById("topic").style) { (display = "") }
                                     with (document.getElementById("chooseTopic").style) { (display = "none") }
+                                    $("#topicContent").text("选题: " + result.topics[0].id + "  " + result.topics[0].topic.name);
                                 }
                             }
+                            //自己为组员的前提下，不显示辞职,只显示选好的话题
                             if (userIden == "member")
                             {
                                 with (document.getElementById("resign").style) { (display = "none") }
-                                if(result.Data.topics.id == "")
+                                if (result.topics[0] == null)
                                 {
                                     with (document.getElementById("topic").style) { (display = "none") }
                                     with (document.getElementById("chooseTopic").style) { (display = "none") }
@@ -66,16 +76,27 @@
                                 {
                                     with (document.getElementById("topic").style) { (display = "") }
                                     with (document.getElementById("chooseTopic").style) { (display = "none") }
+                                    $("#topicContent").text("选题: " + result.topics[0].id + "  " + result.topics[0].topic.name);
                                 }
                             }
+                            $("#leader").html(result.leader.name + "<br/>" + result.leader.number);
+                            $.each(result.members, function (i, value) {
+                                if (value.number != result.leader.number) {
+                                    var imgObj = " <img src=\"\\images\\GroupList\\user.png\"/>";
+                                    $("#members").append('<div class="block">' + '<div class="panel-body">' + '<div class="column1">' + imgObj + '</div>' + ' <div class="column2">' + value.name + "<br/>" + value.number + '</div>' + '</div>' + '</div>');
+                                }
+                            });
                         }
+                        //如果没有组长
                         else
                         {
+                            //显示出当选组长的按钮
                             with (document.getElementById("leaderIcon").style) { (display = "none") }
                             with (document.getElementById("becomeLeader").style) { (display = "") }
+                            with (document.getElementById("captain").style) { (display = "none") }
                             with (document.getElementById("hit").style) { (display = "") }
                             with (document.getElementById("chooseTopic").style) { (display = "none") }
-                            if (result.Data.topics.id == "")
+                            if (result.topics[0].id == null)
                             {
                                 with (document.getElementById("topic").style) { (display = "none") }
                             }
@@ -84,35 +105,49 @@
                                 with (document.getElementById("topic").style) { (display = "") }
                             }
                             with (document.getElementById("resign").style) { (display = "none") }
+                            $.each(result.members, function (i, value) {
+                                //if (value.number != result.leader.number) {
+                                    var imgObj = " <img src=\"\\images\\GroupList\\user.png\"/>";
+                                    $("#members").append('<div class="block">' + '<div class="panel-body">' + '<div class="column1">' + imgObj + '</div>' + ' <div class="column2">' + value.name + "<br/>" + value.number + '</div>' + '</div>' + '</div>');
+                               // }
+                            });
                         }
-                        $("#topicContent").text("选题: " + result.Data.topics.id + result.Data.topics.name);
-                        $("#leader").text(result.Data.leader.name + "\n" + result.Data.leader.id);
-                        $.each(result.Data.members, function (i, value)
-                        {
-                            var imgObj = " <img src=\"\\images\\GroupList\\user.png\"/>";
-                            $("#members").append('<div class="block">' + '<div class="panel-body">' + '<div class="column1">' + imgObj + '</div>' + ' <div class="column2">' + value.name + "\n" + value.id + '</div>' + '</div>' + '</div>');
-                        });
-                        if (window.localStorage.getItem("currentGM") == "fixed")
-                        {
-                            with (document.getElementById("groupingMethod1").style) { (display = "none") }
-                            with (document.getElementById("groupingMethod2").style) { (display = "") }
-                        }
-                        else
-                        {
-                            with (document.getElementById("groupingMethod1").style) { (display = "") }
-                            with (document.getElementById("groupingMethod2").style) { (display = "none") }
-                        }
+                       // $("#topicContent").text("选题: " + result.topics[0].id + "  " + result.topics[0].topic.name);
+                        //$("#leader").html(result.leader.name + "<br/>" + result.leader.number);
+                        //$.each(result.members, function (i, value)
+                        //{
+                        //    if (value.number != result.leader.number) {
+                        //        var imgObj = " <img src=\"\\images\\GroupList\\user.png\"/>";
+                        //        $("#members").append('<div class="block">' + '<div class="panel-body">' + '<div class="column1">' + imgObj + '</div>' + ' <div class="column2">' + value.name + "<br/>" + value.number + '</div>' + '</div>' + '</div>');
+                        //    }
+                        //});
+                        //if (window.localStorage.getItem("currentGM") == "fixed")
+                        //{
+                        //    with (document.getElementById("groupingMethod1").style) { (display = "none") }
+                        //    with (document.getElementById("groupingMethod2").style) { (display = "") }
+                        //}
+                        //else
+                        //{
+                        //    with (document.getElementById("groupingMethod1").style) { (display = "") }
+                        //    with (document.getElementById("groupingMethod2").style) { (display = "none") }
+                        //}
+                    },
+                    error: function (result) {
+                        alert(result.responseText);
+
                     }
                 })
         })
         $(document).on("click",".btnquit",function ()
         {
+            var token = window.localStorage.getItem("jwt");
             $.ajax(
                 {
                     type: 'PUT',
-                    url: "/api/group/13/resign?id=\"24320152202746\"",
+                    url: "/api/group/" + window.localStorage.getItem("groupID") + "/resign",
                     data: "",
                     contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result)
                     {
@@ -132,12 +167,14 @@
             with (document.getElementById("chooseTopic").style) { (display = "none") }
         })
         $(document).on("click", ".btnleader", function () {
+            var token = window.localStorage.getItem("jwt");
             $.ajax(
                 {
                     type: 'PUT',
-                    url: "/api/group/13/assign?id=\"24320152202746\"",
+                    url: "/api/group/" + window.localStorage.getItem("groupID") + "/assign",
                     data: "",
                     contentType: "application/json; charset=utf-8",
+                    headers: { "Authorization": "Bearer " + token },
                     dataType: "json",
                     success: function (result)
                     {
@@ -154,8 +191,7 @@
 <body class="fullbackground">
     <div class="columndisplay">
         <img class="UsersIcon" src="~/images/GroupList/users.png"/>
-        <label class="seminarblackword" id="groupingMethod1">讨论课4<br/>随机分组</label>
-        <label class="seminarblackword" id="groupingMethod2">讨论课4<br/>固定分组</label>
+        <label class="seminarblackword" id="groupingMethod"></label>
     </div>
 
     <div class="whiteword">
@@ -165,9 +201,9 @@
         </div>
     </div>
 
-    <div class="block">
+    <div class="block" id="captain">
         <div class="panel-body">
-            <div class="column1"><img src="~/Content/GroupList/user.png"/></div>
+            <div class="column1"><img src="~/images/GroupList/user.png"/></div>
             <div class="column2" id="leader"></div>
             <div class="column3 rightblueword" id="leaderIcon">队长</div>
         </div>

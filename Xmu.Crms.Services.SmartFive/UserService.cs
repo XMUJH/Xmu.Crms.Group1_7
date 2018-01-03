@@ -84,10 +84,13 @@ namespace Xmu.Crms.Services.SmartFive
             attendance.Seminar = (from k in _db.Seminar
                                   where k.Id == seminarId
                                   select k).SingleOrDefault();
-            attendance.AttendanceStatus = 0;
+            if(location.Status == 1)
+                attendance.AttendanceStatus = AttendanceStatus.Present;
+            if (location.Status == 0)
+                attendance.AttendanceStatus = AttendanceStatus.Late;
             _db.Attendences.Add(attendance);
             _db.SaveChanges();
-            return attendance.Id;
+            return (attendance.AttendanceStatus == AttendanceStatus.Present) ? 0 : 1;
             throw new System.InvalidOperationException();
         }
 

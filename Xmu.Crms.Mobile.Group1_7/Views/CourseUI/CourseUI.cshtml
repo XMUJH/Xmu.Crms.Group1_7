@@ -38,14 +38,14 @@
                             if (value.judge == 1)
                             {
                                 array.push(value);
-                                $("#seminars").append('<div class="blueBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "-" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:" + value.grade + '</p>' + '</div>');
+                                $("#seminars").append('<div class="blueBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "-" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + /*'<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:" + value.grade + '</p>' +*/ '</div>');
                             }
                                 
                             //$("#seminars").append('<div class="greyBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "至" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:已完成" + '</p>' + '</div>');
                         });
                         $.each(result, function (i, value) {
                             if (value.judge == 0)
-                                $("#seminars").append('<div class="greyBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "-" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + '<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:" + value.grade +  '</p>' + '</div>');
+                                $("#seminars").append('<div class="greyBox">' + '<p class="LeftBoxText">' + value.name + '</p>' + '<p class="RightBoxText1" style="margin-left: 60%;margin-top: 3%">' + value.startTime + "-" + value.endTime + '</p>' + '<p class="RightBoxText2" style="margin-left: 60%;margin-top: 12%">' + "分组方式:" + value.groupingMethod + '</p>' + /*'<p class="RightBoxText3" style="margin-left: 60%;margin-top: 21%">' + "成绩:" + value.grade +  '</p>' +*/ '</div>');
                         });
                     }
                 })

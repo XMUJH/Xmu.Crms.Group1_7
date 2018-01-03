@@ -60,7 +60,7 @@
                                 {
                                     with (document.getElementById("topic").style) { (display = "") }
                                     with (document.getElementById("chooseTopic").style) { (display = "none") }
-                                    $("#topicContent").text("选题: " + result.topics[0].id + "  " + result.topics[0].topic.name);
+                                    $("#topicContent").text("选题: " + result.topics[0].topicId + "  " + result.topics[0].topic.name);
                                 }
                             }
                             //自己为组员的前提下，不显示辞职,只显示选好的话题
@@ -76,7 +76,7 @@
                                 {
                                     with (document.getElementById("topic").style) { (display = "") }
                                     with (document.getElementById("chooseTopic").style) { (display = "none") }
-                                    $("#topicContent").text("选题: " + result.topics[0].id + "  " + result.topics[0].topic.name);
+                                    $("#topicContent").text("选题: " + result.topics[0].topicId + "  " + result.topics[0].topic.name);
                                 }
                             }
                             $("#leader").html(result.leader.name + "<br/>" + result.leader.number);
@@ -96,7 +96,7 @@
                             with (document.getElementById("captain").style) { (display = "none") }
                             with (document.getElementById("hit").style) { (display = "") }
                             with (document.getElementById("chooseTopic").style) { (display = "none") }
-                            if (result.topics[0].id == null)
+                            if (result.topics[0] == null)
                             {
                                 with (document.getElementById("topic").style) { (display = "none") }
                             }

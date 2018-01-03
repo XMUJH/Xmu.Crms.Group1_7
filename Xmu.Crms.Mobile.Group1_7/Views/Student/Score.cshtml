@@ -46,6 +46,7 @@
                         for (var j in data[i]) {
                            var index = parseInt(j) + 1;
                            var name = data[i][j].topic.serial + index;
+                           alert(data[i][j].seminarGroupId);
                            var col = "<div id='" + count + "' class='GradeDiv'><span id='" + data[i][j].seminarGroupId  + "' name='" + data[i][j].topicId + "'class='GroupNum'>" + name
                        // var col = "<div id='" + count + "' class='GradeDiv'><span id='" + data[i].name+ "'name='" + data[i].topicId +  "'class='GroupNum'>" + data[i].name
                                 + "</span> <div> <img id='off' src='/images/Theme/heart_empty.png' class='GroupGradeIcon'/>"

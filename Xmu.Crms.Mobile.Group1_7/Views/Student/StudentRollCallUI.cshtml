@@ -58,6 +58,7 @@
                         headers: { "Authorization": "Bearer " + token },
                         dataType: "json",
                         success: function (result) {
+                            //alert(result);
                             if (result == 0) {
                                 with (document.getElementById("successCall").style) { (display = "none") };
                                 var imgClock = "<img src=\"/images/themes/clock.png\" class=\'courseInfoIcon\' />";

@@ -250,7 +250,7 @@ namespace Xmu.Crms.Group1_7
                     id = s.Id,
                     name = s.Name,
                     description = s.Description,
-                    groupingMethod = (s.IsFixed == true) ? "fixed" : "random",
+                    groupingMethod = (s.IsFixed == true) ? "随机分组" : "固定分组",
                     startTime = s.StartTime.ToString("M"),
                     endTime = s.EndTime.ToString("M"),
                     Judge = ((DateTime.Compare(dt, s.StartTime) > 0) && (DateTime.Compare(s.EndTime, dt) > 0)) ? 1 : 0,
@@ -383,6 +383,50 @@ namespace Xmu.Crms.Group1_7
             //var data = new object[] {
             //    new { seminarName = "需求分析", groupName = "3A2",leaderName = "张三", presentationGrade = 3, reportGrade = 3,grade = 4 },
             //    new { seminarName = "界面原型设计", groupName = "3A3",leaderName = "张三", presentationGrade = 4, reportGrade = 4,grade = 4 }
+            //};
+            //result.Data = data;
+            //return result;
+        }
+
+        //按ID获取课程的班级列表
+        //GET:/course/{courseId}/class
+        [HttpGet("api/course/{courseId}/class/{studentId}")]
+        public IActionResult GetMyClass(int courseId,int studentId)
+        {
+            try
+            {
+                var classes = _classService.ListClassByCourseId(courseId);
+                var selections = _classService.ListClassByUserId(studentId);
+                foreach(var Class in classes)
+                    foreach(var selection in selections)
+                    {
+                        if (Class.Id == selection.Id)
+                            return Json(Class.Id);
+                    }
+                //return Json(classes.Select(c => new {
+                //    id = c.Id,
+                //    name = c.Name,
+                //    time = c.ClassTime,
+                //    site = c.Site,
+                //    number = _userService.ListUserByClassId(c.Id, "", "").Count
+                //    //courseTeacher = c.Course.Teacher.Name,
+                //    //courseName = c.Course.Name
+                //}));
+                return NoContent();
+            }
+            catch (CourseNotFoundException)
+            {
+                return StatusCode(404, new { msg = "未找到课程" });
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400, new { msg = "错误的ID格式" });
+            }
+
+            //JsonResult result = new JsonResult();
+            //var data = new object[] {
+            //    new { id = 45, name = "周三1-2节"},
+            //    new { id = 48, name = "周三3-4节"}
             //};
             //result.Data = data;
             //return result;

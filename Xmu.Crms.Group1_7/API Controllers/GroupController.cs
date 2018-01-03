@@ -26,14 +26,19 @@ namespace Xmu.Crms.Group1_7
         IFixGroupService _fixGroupService;
         ITopicService _topicService;
         IGradeService _gradeService;
-
-        public GroupController(CrmsContext db,ITopicService topicService, ISeminarGroupService seminarGroupService,IFixGroupService fixGroupService,IGradeService gradeService)
+        ICourseService _courseService;
+        IClassService _classService;
+        ITopicService _topicService;
+        public GroupController(CrmsContext db,ISeminarGroupService seminarGroupService,IFixGroupService fixGroupService,IGradeService gradeService, ICourseService courseService, IClassService classService, ITopicService topicService)
         {
             _db = db;
             _topicService = topicService;
             _seminarGroupService = seminarGroupService;
             _fixGroupService = fixGroupService;
             _gradeService = gradeService;
+            _courseService = courseService;
+            _classService = classService;
+            _topicService = topicService;
         }
         
         //按小组ID获取小组详情
@@ -404,22 +409,49 @@ namespace Xmu.Crms.Group1_7
             //response.Content = new StringContent("成功", Encoding.UTF8);
             //return response;
         }
-
         //提交对其他小组的打分
         //PUT:/group/{groupId}/grade/presentation/{studentId}
         //[FromBody]dynamic presentation
-        [HttpPut("api/group/{groupId}/grade/presentation/{studentId}")]
-        public IActionResult SubmitPresentationGrade(long groupId, long studentId,long topicId,int grade)
+        //[HttpPut("api/group/{groupId}/grade/presentation/{studentId}")]
+        //public IActionResult SubmitPresentationGrade(long groupId, long studentId, long topicId, int grade)
+        //{
+        //    try
+        //    {
+        //        _gradeService.InsertGroupGradeByUserId(topicId, studentId, groupId, grade);
+        //    }
+        //    catch (GroupNotFoundException)
+        //    {
+        //        return StatusCode(404, new { msg = "未找到小组" });
+        //    }
+        //    catch (Xmu.Crms.Shared.Exceptions.InvalidOperationException)
+        //    {
+        //        return StatusCode(409, new { msg = "已评分，不能重复评分" });
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, new { msg = "错误的Id格式" });
+        //    }
+        //    return NoContent();
+        //    //HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.NoContent);
+        //    //response.Content = new StringContent("成功",Encoding.UTF8);
+        //    //return response;
+        //}
+        //提交对其他小组的打分
+        //PUT:/group/{groupId}/grade/presentation/{studentId}
+        //[FromBody]dynamic presentation
+        [HttpPut("api/group/{groupId}/grade/presentation/{topicId}/{grade}")]
+        public IActionResult SubmitPresentationGrade([FromRoute]long groupId, long topicId, int grade)
         {
             try
             {
-                _gradeService.InsertGroupGradeByUserId(topicId, studentId, groupId,grade);
-            }    
+                //if(groupId)
+                _gradeService.InsertGroupGradeByUserId(topicId, User.Id(), groupId, grade);
+            }
             catch (GroupNotFoundException)
             {
                 return StatusCode(404, new { msg = "未找到小组" });
             }
-            catch(Xmu.Crms.Shared.Exceptions.InvalidOperationException)
+            catch (Xmu.Crms.Shared.Exceptions.InvalidOperationException)
             {
                 return StatusCode(409, new { msg = "已评分，不能重复评分" });
             }
@@ -432,5 +464,57 @@ namespace Xmu.Crms.Group1_7
             //response.Content = new StringContent("成功",Encoding.UTF8);
             //return response;
         }
+
+
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[HttpPut("api/group/{id}/grade/presentation")]
+        //public IActionResult PostGrade(long id, [FromQuery]long topicId, [FromQuery]int grade)
+        //{
+        //    try
+        //    {
+        //        var userId = User.Id();
+        //        _gradeService.InsertGroupGradeByUserId(topicId, userId, id, grade);
+        //        return Json(new { status = 200 });
+        //    }
+        //    catch (GroupNotFoundException)
+        //    {
+        //        return StatusCode(404, new { msg = "没有找到该课程" });
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, new { msg = "组号格式错误" });
+        //    }
+
+        //}
+
+        //[HttpPut("api/group/{groupId:long}/grade/presentation/{studentId:long}")]
+        //public IActionResult SubmitStudentGradeByGroupId([FromBody] long groupId, [FromBody] long studentId,
+        //   [FromBody] StudentScoreGroup updated)
+        //{
+        //    try
+        //    {
+        //        if (User.Type() != Shared.Models.Type.Student)
+        //        {
+        //            return StatusCode(403, new { msg = "权限不足" });
+        //        }
+
+        //        if (updated.Grade == null)
+        //        {
+        //            return NoContent();
+        //        }
+
+        //        _gradeService.InsertGroupGradeByUserId(updated.SeminarGroupTopic.Topic.Id, updated.Student.Id,
+        //            groupId, (int)updated.Grade);
+        //        return NoContent();
+        //    }
+        //    catch (GroupNotFoundException)
+        //    {
+        //        return StatusCode(404, new { msg = "没有找到该课程" });
+        //    }
+        //    catch (ArgumentException)
+        //    {
+        //        return StatusCode(400, new { msg = "组号格式错误" });
+        //    }
+        //}
     }
 }

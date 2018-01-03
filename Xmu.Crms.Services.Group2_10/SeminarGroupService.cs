@@ -185,12 +185,10 @@ namespace Xmu.Crms.Services.Group2_10
             foreach (Attendance atten in attendances)
             {
                 //如果是出勤或迟到状态，进入分配
-                if (atten.AttendanceStatus == AttendanceStatus.Present
-                    || atten.AttendanceStatus == AttendanceStatus.Late)
+                if (atten.AttendanceStatus == AttendanceStatus.Present)
                 {
                     //获取该学生（需要返回的list有include学生对象）
                     UserInfo student = atten.Student;
-
                     try
                     {
                         //如果该学生已经分配了小组，就不需要再分配

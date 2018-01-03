@@ -137,62 +137,31 @@ namespace Xmu.Crms.Group1_7
         //添加成员
         //PUT:/group/{groupId}/add
         //???怎么区分固定小组和讨论课小组
-        [HttpPut("api/group/{groupId}/add")]
-        public IActionResult AddMember(long groupId, long id,int groupType)
+        [HttpPut("api/group/{groupId}/add/{studentId}")]
+        public IActionResult AddMember(long groupId, long studentId)
         {
-            long record;
-
-            //固定小组
-            if (groupType == 0)
-            {
-                try
-                {
-                    record = _fixGroupService.InsertStudentIntoGroup(id, groupId);
-                }
-                catch(UserNotFoundException)
-                {
-                    return StatusCode(400, new { msg = "不存在该学生" });
-                }
-                catch(FixGroupNotFoundException)
-                {
-                    return StatusCode(404, new { msg = "未找到小组" });
-                }
-                catch(Xmu.Crms.Shared.Exceptions.InvalidOperationException)
-                {
-                    return StatusCode(409, new { msg = "待添加学生已经在小组里了" });
-                }
-                catch (ArgumentException)
-                {
-                    return StatusCode(400, new { msg = "错误的Id格式" });
-                }
-
-            }
             //讨论课小组
-            else if(groupType==1)
+            try
             {
-                try
-                {
-                    record = _seminarGroupService.InsertSeminarGroupMemberById(id, groupId);
-                }
-                catch (UserNotFoundException)
-                {
-                    return StatusCode(400, new { msg = "不存在该学生" });
-                }
-                catch (GroupNotFoundException)
-                {
-                    return StatusCode(404, new { msg = "未找到小组" });
-                }
-                catch (Xmu.Crms.Shared.Exceptions.InvalidOperationException)
-                {
-                    return StatusCode(409, new { msg = "待添加学生已经在小组里了" });
-                }
-                catch (ArgumentException)
-                {
-                    return StatusCode(400, new { msg = "错误的Id格式" });
-                }
+                var id = _seminarGroupService.InsertSeminarGroupMemberById(studentId, groupId);
+                return NoContent();
             }
-            return NoContent();
-             
+            catch (UserNotFoundException e)
+            {
+                return StatusCode(400, e.GetAlertInfo());
+            }
+            catch (GroupNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (Xmu.Crms.Shared.Exceptions.InvalidOperationException e)
+            {
+                return StatusCode(409, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400, "错误的Id格式");
+            } 
             //HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.NoContent);
             //response.Content = new StringContent("成功", Encoding.UTF8);
             //return response;

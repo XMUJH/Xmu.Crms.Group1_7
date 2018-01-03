@@ -1,0 +1,308 @@
+﻿@{ 
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="divport" content="width=device-width,
+                                     initial-scale=1.0,
+                                     maximum-scale=1.0">
+    <title>课程管理系统</title>
+    <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="~/css/GroupInfoUI2.css">
+    <script>
+        var token = window.localStorage.getItem("jwt");
+        var array1 = new Array();
+        var array2 = new Array();
+        $(document).ready(function ()
+        {
+            $.ajax({
+                type: "GET",
+                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID")+"/group",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (result)
+                {
+                    $.each(result, function (ii, value)
+                    {
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/seminar/group/" + value.id + "/groupTopic",
+                            data: "",
+                            contentType: "application/json; charset=utf-8",
+                            headers: { "Authorization": "Bearer " + token },
+                            dataType: "json",
+                            success: function (result2)
+                            {
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/api/seminar/group/" + value.id + "/groupMember",
+                                    data: "",
+                                    contentType: "application/json; charset=utf-8",
+                                    headers: { "Authorization": "Bearer " + token },
+                                    dataType: "json",
+                                    success: function (result3)
+                                    {
+                                        $.each(result2, function (aa, topics)
+                                        {
+                                            $("#groups").append(
+                                                '<div onclick="showMembers(' + value.id + ')" class=\"studentListBarDiv\">' +
+                                                '<span class=\"groupName\">' + "队伍" + ii + '</span>'+
+                                                '<span class=\"groupTopics\">选题:' + topics.topic.name + '</span>' + '</div >');
+                                            return false;
+                                        });
+                                        var left = true;
+                                        $("#groups").append('<div id=\"members_' + value.id + '\"hidden/>');
+                                        $.each(result3, function (i, member)
+                                        {
+                                            if (left == true) {
+                                                $("#members_" + value.id).append('<div class=\'studentLeftBlock\'>' +
+                                                    '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                                    '<span class=\"studentName\">' + member.name + '</span></div>');
+                                                left = false;
+                                            }
+                                            else {
+                                                $("#members_" + value.id).append('<div class=\'studentRightBlock\'>' +
+                                                    '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                                    '<span class=\"studentName\">' + member.name + '</span></div>');
+                                                left = true;
+                                            }
+                                        })
+                                          //空白添加学生的块
+                                        if (left == true)
+                                        {
+                                            $("#members_" + value.id).append('<div class=\'studentLeftBlock\'>' +
+                                                '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\' onclick=\"addStu()\"/>');
+                                            left = false;
+                                        }
+                                        else
+                                        {
+                                            $("#members_" + value.id).append('<div class=\'studentRightBlock\'>' +
+                                                '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\' onclick=\"addStu()\"/>');
+                                            left = true;
+                                        }
+                                    },
+                                    error: function (data3)
+                                    {
+                                        alert(data3.responseText);
+
+                                    }
+                                })
+                            },
+                            error: function (data2)
+                            {
+                                alert(data2.responseText);
+
+                            }
+                        });
+                    })
+                },
+                error: function (data)
+                {
+                    alert(data.responseText);
+
+                }
+            })
+            $.ajax({
+                type: "GET",
+                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/late",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result.attendances, function (i, value) {
+                        array2.push(value.name);
+                        array1.push(value.id);
+                        $("#addLateStudent").append('<option class=/"modallist/">' + value.name + '</option> ');
+                    });
+                },
+                error: function (data) {
+                    alert(data.responseText);
+
+                }
+            })
+            $.ajax({
+                type: "GET",
+                url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/class/" + window.localStorage.getItem("classID") + "/attendance/absent",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (result)
+                {
+                    $.each(result.attendances, function (i, value)
+                    {
+                        var imgObj = "<img src=\"\\images\\themes\\user.png\" class=\'userIcon\' />";
+                        if (i % 2 == 0)
+                            $("#lateStudents").append('<div class=\'studentLeftBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                        else
+                            $("#lateStudents").append('<div class=\'studentRightBlock\'>' + imgObj + '<span class=\"studentName\">' + value.name + '</span ></div > ');
+                    });
+                },
+                error: function(data)
+                {
+                    alert(data.responseText);
+
+                }
+            })
+            $(document).on("click", "#confirm", function ()
+            {
+                if (confirm("确认添加该学生?"))
+                {
+                    for (var x in array2)
+                    {
+                        if (array2[x] == $("#addLateStudent").find("option:selected").text())
+                        {
+                            window.localStorage.setItem('currentChooseStu', array1[x]);
+                            break;
+                        }
+                    }
+                    $.ajax({
+                        type: "PUT",
+                        url: "/api/group/" + window.localStorage.getItem("currentChooseGroup") + "/add/" + window.localStorage.getItem("currentChooseStu"),
+                        data: "",
+                        contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
+                        dataType: "json",
+                        success: function (result)
+                        {
+                            location.reload()
+                        },
+                        error: function (data)
+                        {
+                            alert(data.responseText);
+
+                        }
+                    })
+                }
+            });
+
+        })
+        /*
+        function getMember(group, i)
+        {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/api/group/"+i+"?embedTopics=true&embedGrade=false",
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var left = true;
+                    $("#groups").append('<div id=\"members_' + ii + '\"hidden/>');
+
+                    if (result.Data.leader != "undefined") {
+                        $("#members_" + ii).append(
+                            '<div class=\'studentLeftBlock\'>' +
+                            '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                            '<span class=\"studentName\">' + result.Data.leader.name + '</span >' +
+                            '</div>'
+                        );
+                        left = false;
+                    }
+                    $.each(result.Data.members, function (i, member) {
+                        if (left == true) {
+                            $("#members_" + ii).append('<div class=\'studentLeftBlock\'>' +
+                                '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                '<span class=\"studentName\">' + member.name + '</span></div>');
+                            left = false;
+                        }
+                        else {
+                            $("#members_" + ii).append('<div class=\'studentRightBlock\'>' +
+                                '<img src=\"\\images\\themes\\user.png\" class=\'userIcon\'/>' +
+                                '<span class=\"studentName\">' + member.name + '</span></div>');
+                            left = true;
+                        }
+                    })
+                    //空白添加学生的块
+                    if (left == true) {
+                        $("#members_" + ii).append('<div class=\'studentLeftBlock\'>' +
+                            '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\'/>');
+                        left = false;
+                    }
+                    else {
+                        $("#members_" + ii).append('<div class=\'studentRightBlock\'>' +
+                            '<img src=\"\\images\\themes\\add.png\" class=\'addIcon\'/>');
+                        left = true;
+                    }
+                }
+            })
+        }
+        */
+        function showMembers(i)
+        {
+            window.localStorage.setItem('currentChooseGroup',i)
+            $("#members_" + i).toggle("");
+        }
+        function addStu()
+        {
+            $("#new").modal("show");
+        }
+
+
+
+    </script>
+
+
+
+
+</head>
+<body>
+    <!--设置左上角的usersIcon-->
+    <div class="blueUsersDiv">
+        <img src="~/images/themes/users.png" class="blueUsersIcon"/>
+    </div>
+
+    <div class="title">队伍信息</div>
+
+    <!--细线，hr不好设置css，用一个高度很小的div来代替-->
+    <div class="hrDiv">
+    </div>
+
+    <!--队伍列表-->
+    <div id="groups">
+
+    </div>
+
+    <!--学生块，分为左边的和右边的，增加学生的时候选择好左边或者
+    右边后直接复制就好，之后在span下面修改学生名字-->
+
+    <!-- 模态框（Modal） -->
+
+    <div class="modal fade modalstyle" id="new">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title modaltitle" id="myModalLabel">学生添加</h4>
+                </div>
+                <select id="addLateStudent">
+                </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default modalclosebutton" data-dismiss="modal">关闭</button>
+                    <button id="confirm" type="button" class="btn btn-primary modalconfirmbutton">确认</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+ 
+
+    <!--迟到学生上面那个蓝色的bar-->
+    <div class='studentNoCallBarDiv'>
+        <span class="barText">未签到学生</span>
+    </div>
+
+    <!--未签到学生-->
+    <div id="lateStudents">
+
+    </div>
+</body>
+</html>

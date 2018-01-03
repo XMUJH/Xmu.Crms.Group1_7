@@ -216,26 +216,68 @@ namespace Xmu.Crms.Group1_7
             return Created("/topic/" + topicid, newTopic);
         }
 
-        //没有小组成员 和 report
-        [HttpGet("api/seminar/{seminarId:long}/group")]
-        public IActionResult GetGroupsBySeminarId([FromRoute] long seminarId)
+        [HttpGet("api/seminar/{seminarId}/class/{classId}/group")]
+        public IActionResult GetGroupsBySeminarId(long seminarId,long classId)
         {
             try
             {
-                var groups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
-                return Json(groups.Select(t => new
+                IList<SeminarGroup> rawGroups = _seminargroupService.ListSeminarGroupBySeminarId(seminarId);
+                SeminarGroup tool;
+                IList<SeminarGroup> groups = new List<SeminarGroup>();
+                foreach (SeminarGroup x in rawGroups)
                 {
-                    id = t.Id,
-                    name = t.Id + "组"
-                }));
+                    if(x.ClassId==classId)
+                    {
+                        tool = new SeminarGroup();
+                        tool = x;
+                        groups.Add(tool);
+                    }
+                }
+                return Json(groups);
             }
-            catch (SeminarNotFoundException)
+            catch (SeminarNotFoundException e)
             {
-                return StatusCode(404, new { msg = "讨论课不存在" });
+                return StatusCode(404, e.GetAlertInfo());
             }
             catch (ArgumentException)
             {
-                return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
+                return StatusCode(400, "讨论课ID输入格式有误");
+            }
+        }
+
+        [HttpGet("api/seminar/group/{groupId}/groupTopic")]
+        public IActionResult GetTopicByGroupId(long groupId)
+        {
+            try
+            {
+                IList<SeminarGroupTopic> topics = _topicService.ListSeminarGroupTopicByGroupId(groupId);
+                return Json(topics);
+            }
+            catch (GroupNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400, "ID输入格式有误");
+            }
+        }
+
+        [HttpGet("api/seminar/group/{groupId}/groupMember")]
+        public IActionResult GetMemberByGroupId(long groupId)
+        {
+            try
+            {
+                IList<UserInfo> members = _seminargroupService.ListSeminarGroupMemberByGroupId(groupId);
+                return Json(members);
+            }
+            catch (GroupNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400, "ID输入格式有误");
             }
         }
 
@@ -279,6 +321,7 @@ namespace Xmu.Crms.Group1_7
                 return StatusCode(400, new { msg = "讨论课ID输入格式有误" });
             }
         }
+
 
         [HttpPut("api/seminar/{seminarId}/class/{classId}/startCall")]
         public IActionResult StartCallInRoll(long seminarId, long classId, [FromBody]dynamic json)
@@ -479,13 +522,85 @@ namespace Xmu.Crms.Group1_7
             }
             try
             {
-                IList<UserInfo> attendances = _userService.ListAbsenceStudent(seminarId, classId);
+                IList<UserInfo> users1 = _userService.ListPresentStudent(seminarId, classId);
+                IList<UserInfo> users2 = _userService.ListLateStudent(seminarId, classId);
+                IList<UserInfo> users3 = new List<UserInfo>();
+                IList<long> usersId2 = new List<long>();
+                foreach (UserInfo x in users1)
+                {
+                    users3.Add(x);
+                }
+                foreach (UserInfo x in users2)
+                {
+                    users3.Add(x);
+                }
+                foreach (UserInfo x in users3)
+                {
+                    usersId2.Add(x.Id);
+                }
+                IList<UserInfo> users = _userService.ListUserByClassId(classId, "", "");
+                IList<long> usersId = new List<long>();
+                foreach (UserInfo x in users)
+                {
+                    usersId.Add(x.Id);
+                }
+                IList<UserInfo> attendances = new List<UserInfo>();
+                UserInfo tool;
+                foreach (long x in usersId)
+                {
+                    if (usersId2.Contains(x) == false)
+                    {
+                        tool = new UserInfo();
+                        tool = _userService.GetUserByUserId(x);
+                        attendances.Add(tool);
+                    }
+                }
                 var result = new
                 {
-                    numAbsent = attendances.Count,
+                    numAbsent = attendances.Count(),
                     attendances
                 };
                 return Json(result);
+            }
+            catch (ClassNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (SeminarNotFoundException e)
+            {
+                return StatusCode(404, e.GetAlertInfo());
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(404, "错误的ID格式");
+            }
+        }
+
+        [HttpPut("api/seminar/{seminarId}/class/{classId}/autoGroup")]
+        public IActionResult AutoGrouping(long seminarId, long classId)
+        {
+            if (User.Type() != Type.Teacher)
+            {
+                return StatusCode(403, "权限不足");
+            }
+            try
+            {
+                if(seminarId<=0||classId<=0)
+                {
+                    throw new ArgumentException();
+                }
+                SeminarGroup x;
+                for(int i=1;i<=5;i++)
+                {
+                    x = new SeminarGroup();
+                    x.SeminarId = seminarId;
+                    x.ClassId = classId;
+                    x.LeaderId = 0;
+                    _db.SeminarGroup.Add(x);
+                }
+                _db.SaveChanges();
+                _seminargroupService.AutomaticallyGrouping(seminarId, classId);
+                return NoContent();
             }
             catch (SeminarNotFoundException e)
             {
@@ -494,6 +609,10 @@ namespace Xmu.Crms.Group1_7
             catch (ClassNotFoundException e)
             {
                 return StatusCode(404, e.GetAlertInfo());
+            }
+            catch(Shared.Exceptions.InvalidOperationException e)
+            {
+                return StatusCode(401, e.GetAlertInfo());
             }
             catch (ArgumentException)
             {

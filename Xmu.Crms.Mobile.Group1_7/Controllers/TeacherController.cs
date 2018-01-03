@@ -10,32 +10,14 @@ namespace Xmu.Crms.Mobile.Group1_7.Controllers
             return View();
         }
 
-        [Route("Teacher/RandomRollStartCallUI")]
-        public IActionResult RandomRollStartCallUI()
-        {
-            return View();
-        }
-
-        [Route("Teacher/RandomRollCallUI")]
-        public IActionResult RandomRollCallUI()
-        {
-            return View();
-        }
-
-        [Route("Teacher/RandomEndRollCallUI")]
-        public IActionResult RandomEndRollCallUI()
-        {
-            return View();
-        }
-
         [Route("Teacher/RollCallListUI")]
         public IActionResult RollCallListUI()
         {
             return View();
         }
 
-        [Route("Teacher/GroupInfoUI")]
-        public IActionResult GroupInfoUI()
+        [Route("Teacher/RandomGroupInfoUI")]
+        public IActionResult RandomGroupInfoUI()
         {
             return View();
         }
@@ -48,12 +30,6 @@ namespace Xmu.Crms.Mobile.Group1_7.Controllers
 
         [Route("Teacher/RollCallUI")]
         public IActionResult RollCallUI()
-        {
-            return View();
-        }
-
-        [Route("Teacher/RollCallEndUI")]
-        public IActionResult RollCallEndUI()
         {
             return View();
         }

@@ -15,12 +15,14 @@
     <link rel="stylesheet" href="~/css/GroupInfoUI2.css">
     <script src="~/Scripts/jquery-1.10.2.js" crossorigin="anonymous"></script>
     <script>
+        var token = window.localStorage.getItem("jwt");
         $(document).ready(function () {
             $.ajax({
                 type: "GET",
                 url: "/api/seminar/32/group?gradeable=true&classId=23",
                 data: "",
                 contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
                 dataType: "json",
                 success: function (result) {
                     $.each(result.Data, function (i, value) {

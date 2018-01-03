@@ -291,7 +291,7 @@ namespace Xmu.Crms.Group1_7
                     startTime = s.StartTime.ToString("M"),
                     endTime = s.EndTime.ToString("M"),
                     Judge = ((DateTime.Compare(dt, s.StartTime) > 0) && (DateTime.Compare(s.EndTime, dt) > 0)) ? 1 : 0,
-                    grade = (_seminarGroupService.GetSeminarGroupById(s.Id, User.Id()).FinalGrade > 0) ? _seminarGroupService.GetSeminarGroupById(s.Id, User.Id()).FinalGrade : 0
+                   // grade = (_seminarGroupService.GetSeminarGroupById(s.Id, User.Id()).FinalGrade > 0) ? _seminarGroupService.GetSeminarGroupById(s.Id, User.Id()).FinalGrade : 0
                 }));
             }
             catch (CourseNotFoundException)

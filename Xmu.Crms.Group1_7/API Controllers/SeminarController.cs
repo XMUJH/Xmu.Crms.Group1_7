@@ -177,7 +177,7 @@ namespace Xmu.Crms.Group1_7
             }
         }
 
-        //groupLeft未加
+
         [HttpGet("api/seminar/{seminarId:long}/topic")]
         public IActionResult GetTopicsBySeminarId([FromRoute] long seminarId)
         {
@@ -191,7 +191,34 @@ namespace Xmu.Crms.Group1_7
                     name = t.Name,
                     description = t.Description,
                     groupLimit = t.GroupNumberLimit,
+                    groupMemberLimit = t.GroupStudentLimit
+                }));
+            }
+            catch (SeminarNotFoundException)
+            {
+                return StatusCode(404, new { msg = "讨论课不存在" });
+            }
+            catch (ArgumentException)
+            {
+                return StatusCode(400, new { msg = "话题ID输入格式有误" });
+            }
+        }
+
+        [HttpGet("api/seminar/{seminarId:long}/{classId:long}/topic")]
+        public IActionResult GetTopicsBySeminarId([FromRoute] long seminarId,[FromRoute] long classId)
+        {
+            try
+            {
+                var topics = _topicService.ListTopicBySeminarId(seminarId);
+                return Json(topics.Select(t => new
+                {
+                    id = t.Id,
+                    serial = t.Serial,
+                    name = t.Name,
+                    description = t.Description,
+                    groupLimit = t.GroupNumberLimit,
                     groupMemberLimit = t.GroupStudentLimit,
+                    groupLeft = _topicService.GetRestTopicById(t.Id, classId, seminarId)
                 }));
             }
             catch (SeminarNotFoundException)

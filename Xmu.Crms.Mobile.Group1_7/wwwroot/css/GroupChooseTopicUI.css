@@ -75,6 +75,7 @@ body {
     margin-top: 5%;
 }
 
+
 /*当选题未选完时的灰色框*/
 
 .greyTopicDiv {
@@ -114,9 +115,10 @@ body {
     color: #fff;
     float: left;
     font-size: 2.5em;
-    margin-left: 3%;
+    margin-left: 4%;
     width: 60%;
-    margin-top: 3%;
+    height: 100%;
+    margin-top: 5%;
 }
 
 /*选题框右边的剩余人数，当人数大于等于2时为白色*/

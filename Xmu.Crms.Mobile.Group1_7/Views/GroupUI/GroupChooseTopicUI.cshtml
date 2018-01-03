@@ -18,62 +18,102 @@
             crossorigin="anonymous"></script>
     <link href="~/css/GroupChooseTopicUI.css" rel="stylesheet" type="text/css">
     <script>
-        $(document).ready(function ()
-        {
+        var array1 = new Array();
+        var array2 = new Array();
+        var token = window.localStorage.getItem("jwt");
+        $(document).ready(function () {
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/seminar/9/topic",
-                    data:"",
+                    url: "/api/seminar/" + window.localStorage.getItem("seminarID") + "/" + window.localStorage.getItem("classID") + "/topic",
+                    data: "",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
-                    success: function (result)
-                    {
-                        var c = document.cookie.split(";")[0].split("=")[1];
-                        $.each(result.Data, function (i, value)
-                        {
-                            var imgObj = "<img src=\"/images/GroupChooseTopicUI/nine.png\" class=\"nineIcon\" />";
-                            if (value.groupLeft >= 2) $("#topics").append('<div class="blueTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '<span class="leftNumWhite">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' + imgObj + '</div>');
-                            if (value.groupLeft == 1) $("#topics").append('<div class="blueTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '<span class="leftNumRed">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' + imgObj + '</div>');
-                            if (value.groupLeft == 0) $("#topics").append('<div class="greyTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '<span class="leftNumWhite">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' + imgObj + '</div>');
-                            if (c==i)
-                            {
-                                $("#topics").append('<div class="topicDescribeDiv">' + '<span class="topicDescribeTitle">' + value.name + '</span>' + '<span class="topicDescribeText">' + value.description + '</span>' + '</div>');
-                            }
+                    headers: { "Authorization": "Bearer " + token },
+                    success: function (result) {
+                        $.each(result, function (i, value) {
+                            var ii = i;
+                            array1.push(value.id);
+                            array2.push(value.name);
+                            if (value.groupLeft >= 2)
+                                $("#topics").append('<div class="blueTopicDiv">' + '<div class="chooseTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '</div>' + '<span class="leftNumWhite">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' +
+                                    '<img onclick="showDetail(' + ii + ')" src=\"/images/GroupChooseTopicUI/nine.png\" class=\"nineIcon\" />' + '</div>');
+                            if (value.groupLeft == 1)
+                                $("#topics").append('<div class="blueTopicDiv">' + '<div class="chooseTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>' + '</div>'+ '<span class="leftNumRed">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>' +
+                                    '<img onclick="showDetail(' + ii + ')" src=\"/images/GroupChooseTopicUI/nine.png\" class=\"nineIcon\" />' + '</div>' );
+                            if (value.groupLeft == 0)
+                                $("#topics").append('<div class="greyTopicDiv">' + '<div class="chooseTopicDiv">' + '<span class="topic">' + "话题" + value.serial + '</span>' + '<div class="hrVertical"> </div>' + ' <span class="topicName">' + value.name + '</span>'+ '</div>' + '<span class="leftNumWhite">' + "剩余:" + value.groupLeft + '/' + value.groupLimit + '</span>'  +
+                                    '<img onclick="showDetail(' + ii + ')" src=\"/images/GroupChooseTopicUI/nine.png\" class=\"nineIcon\" />' + '</div>');
+                            /* if (c==i)
+                             {
+                                 $("#topics").append('<div class="topicDescribeDiv">' + '<span class="topicDescribeTitle">' + value.name + '</span>' + '<span class="topicDescribeText">' + value.description + '</span>' + '</div>');
+                             }*/
+                            getDetail(value, ii);
                         });
+                    },
+                    error: function (data) {
+                        alert(data.responseText);
                     }
+
                 })
         })
-        $(document).on("click", ".blueTopicDiv", function ()
-        {
+        $(document).on("click", ".chooseTopicDiv", function () {
+            var a = this.getElementsByClassName("topicName")[0];
+            for (var x in array2) {
+                if (a.innerHTML == array2[x]) {
+                    window.localStorage.setItem('topicID', array1[x]);
+                    break;
+                }
+            }
             var confirmChoose = window.confirm("确定选择此话题吗(一旦选定不能修改)");
-            if (confirmChoose)
-            {
+            if (confirmChoose) {
                 $.ajax(
                     {
                         type: 'POST',
-                        url: "/api/group/13/topic",
+                        url: "/api/group/" + window.localStorage.getItem("groupID") + "/topic/" + window.localStorage.getItem("topicID"),
                         data: "",
                         contentType: "application/json; charset=utf-8",
+                        headers: { "Authorization": "Bearer " + token },
                         dataType: "json",
-                        success: function (result)
-                        {
+                        success: function (result) {
+                            result.groupLeft--;
                             $(window).attr("location", '/GroupUI/GroupUI');
+                        },
+                        error: function (data) {
+                            alert(data.responseText);
                         }
                     })
             }
         })
-        $(document).on("click", ".greyTopicDiv", function ()
-        {
-           window.alert("此话题选择组数已满");
+
+        $(document).on("click", ".greyTopicDiv", function () {
+            window.alert("此话题选择组数已满");
         })
-        $(document).on("click", ".nineIcon", function (event)
+
+        function getDetail(topic, ii) {
+            $.ajax({
+                async: false,
+                type: 'GET',
+                url: "/api/topic/" + array1[ii],
+                data: "",
+                contentType: "application/json; charset=utf-8",
+                headers: { "Authorization": "Bearer " + token },
+                dataType: "json",
+                success: function (result) {
+                    $("#topics").append('<div id=\"topic_' + ii + '\"hidden/>');
+                    $("#topic_" + ii).append('<div class="topicDescribeDiv">' + '<span class="topicDescribeTitle">' + result.name + '</span>' + '<span class="topicDescribeText">' + result.description + '</span>' + '</div>');
+                }
+            })
+        }
+
+        /*$(document).on("click", "#detail_"+ii, function (event)
         {
             event.stopPropagation();
+            var a = this.parentElement;
             $.ajax(
                 {
                     type: 'GET',
-                    url: "/api/topic/9",
+                    url: "/api/topic/" +array1[],
                     data: "",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -90,7 +130,10 @@
                     }
 
                 })
-        })
+        })*/
+        function showDetail(i) {
+            $("#topic_" + i).toggle("");
+        }
     </script>
 </head>
 <body>
@@ -104,6 +147,6 @@
     <div class="hrDiv">
     </div>
     <div id="topics"></div>
-    
+
 </body>
 </html>

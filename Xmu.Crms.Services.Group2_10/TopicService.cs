@@ -264,5 +264,39 @@ namespace Xmu.Crms.Services.Group2_10
             List<SeminarGroupTopic> sgtListToReturn = sgtList.FindAll(x => x.SeminarGroup == group);
             return sgtListToReturn;
         }
+
+         /// <summary>
+        /// 查询话题剩余可选小组数量
+        /// </summary>
+        /// <param name="topicId">话题id</param>
+        /// <param name="classId">班级id</param>
+        /// <returns>topicNum 剩余话题数量</returns>
+        public int GetRestTopicById(long topicId, long classId,long seminarId)
+        {
+            if (topicId <= 0) throw new Shared.Exceptions.InvalidOperationException("话题ID格式错误！");
+            if (classId <= 0) throw new Shared.Exceptions.InvalidOperationException("班级ID格式错误！");
+            if (seminarId <= 0) throw new Shared.Exceptions.InvalidOperationException("讨论课ID格式错误！");
+
+            Topic topic = _db.Topic.Find(topicId);
+            if (topic == null) throw new TopicNotFoundException();
+            int totalGroupNum =(int) topic.GroupNumberLimit;//话题的总组数
+
+            List<SeminarGroup> seminarGroupList = _db.SeminarGroup
+                .Include(x => x.ClassInfo)
+                .Include(x => x.Seminar)
+                .Where(x => x.Seminar.Id == seminarId && x.ClassInfo.Id == classId)
+                .ToList();
+
+
+            List<SeminarGroupTopic> sgtList = _db.SeminarGroupTopic
+                .Include(x => x.Topic)
+                .Include(x => x.SeminarGroup)
+                .Where(x => x.Topic == topic )
+                .ToList();
+
+            List<SeminarGroupTopic> sgtList1 = sgtList.FindAll(x => seminarGroupList.Contains(x.SeminarGroup));
+
+            return totalGroupNum - sgtList1.Count;
+        }
     }
 }

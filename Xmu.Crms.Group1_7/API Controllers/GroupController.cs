@@ -36,7 +36,7 @@ namespace Xmu.Crms.Group1_7
         //按小组ID获取小组详情
         //GET:/group/{groupId}
         [HttpGet("api/group/{groupId}")]
-        public IActionResult GetGroupInfo(long groupId)
+        public IActionResult GetGroupInfo([FromRoute]long groupId)
         {
             try
             {
@@ -284,12 +284,12 @@ namespace Xmu.Crms.Group1_7
         //[FromBody]dynamic json
         //???url
         [HttpPost("api/group/{groupId}/topic/{topicId}")]
-        public IActionResult ChooseTopic(long groupId,long topicId)
+        public IActionResult ChooseTopic([FromRoute]long groupId,[FromRoute]long topicId)
         {
-            string url = "";
             try
             {
-               // url = _seminarGroupService.InsertTopicByGroupId(groupId, topicId);
+                var seminarGroupTopicId = _seminarGroupService.InsertTopicByGroupId(groupId, topicId);
+                return Json(seminarGroupTopicId);
             }
             catch(GroupNotFoundException)
             {
@@ -299,7 +299,7 @@ namespace Xmu.Crms.Group1_7
             {
                 return StatusCode(400, new { msg = "错误的Id格式" });
             }
-            return Json(url);
+           
 
             //JsonResult result = new JsonResult();
             //var Topic = new { url = "/group/27/topic/23" };
